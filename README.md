@@ -1,6 +1,6 @@
 ---
 title: Higgs Audio Demo
-emoji: 🏢
+emoji: 🎤
 colorFrom: green
 colorTo: purple
 sdk: gradio
