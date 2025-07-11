@@ -15,7 +15,7 @@ import time
 from functools import lru_cache
 import re
 import spaces
-
+import torch
 
 # Import HiggsAudio components
 from higgs_audio.serve.serve_engine import HiggsAudioServeEngine
@@ -64,12 +64,7 @@ PREDEFINED_EXAMPLES = {
         "It's your host, Alex, and today, we're diving into a topic that's become absolutely crucial in the tech world — deep learning.\n"
         "And let's be honest, if you've been even remotely connected to tech, AI, or machine learning lately, you know that deep learning is everywhere.\n"
         "\n"
-        "So here's the big question: Do you want to understand how deep learning works?\n"
-        "How to use it to build powerful models that can predict, automate, and transform industries?\n"
-        "Well, today, I've got some exciting news for you.\n"
-        "\n"
-        "We're going to talk about a course that I highly recommend: Dive into Deep Learning.\n"
-        "It's not just another course; it's an entire experience that will take you from a beginner to someone who is well-versed in deep learning techniques.",
+        "So here's the big question: Do you want to understand how deep learning works?\n",
         "description": "Single speaker example",
     },
     "single-speaker-zh": {
@@ -80,7 +75,6 @@ PREDEFINED_EXAMPLES = {
         "<|scene_desc_end|>",
         "input_text": "大家好, 欢迎收听本期的跟李沐学AI. 今天沐哥在忙着洗数据, 所以由我, 希格斯主播代替他讲这期视频.\n"
         "今天我们要聊的是一个你绝对不能忽视的话题: 多模态学习.\n"
-        "无论你是开发者, 数据科学爱好者, 还是只是对人工智能感兴趣的人都一定听说过这个词. 它已经成为AI时代的一个研究热点.\n"
         "那么, 问题来了, 你真的了解多模态吗? 你知道如何自己动手构建多模态大模型吗.\n"
         "或者说, 你能察觉到我其实是个机器人吗?",
         "description": "Single speaker with Chinese text",
@@ -93,6 +87,11 @@ def encode_audio_file(file_path):
     """Encode an audio file to base64."""
     with open(file_path, "rb") as audio_file:
         return base64.b64encode(audio_file.read()).decode("utf-8")
+
+
+def get_current_device():
+    """Get the current device."""
+    return "cuda" if torch.cuda.is_available() else "cpu"
 
 
 def load_voice_presets():
@@ -127,14 +126,15 @@ def get_voice_present(voice_preset):
 
 
 @spaces.GPU
-def initialize_engine(model_path, audio_tokenizer_path, device="cuda") -> bool:
+def initialize_engine(model_path, audio_tokenizer_path) -> bool:
     """Initialize the HiggsAudioServeEngine."""
     global engine
     try:
+        logger.info(f"Initializing engine with model: {model_path} and audio tokenizer: {audio_tokenizer_path}")
         engine = HiggsAudioServeEngine(
             model_name_or_path=model_path,
             audio_tokenizer_name_or_path=audio_tokenizer_path,
-            device=device,
+            device=get_current_device(),
         )
         logger.info(f"Successfully initialized HiggsAudioServeEngine with model: {model_path}")
         return True
@@ -217,10 +217,7 @@ def text_to_speech(
     global engine
 
     if engine is None:
-        error_msg = "Engine not initialized. Please load a model first."
-        logger.error(error_msg)
-        gr.Error(error_msg)
-        return f"❌ {error_msg}", None
+        initialize_engine(DEFAULT_MODEL_PATH, DEFAULT_AUDIO_TOKENIZER_PATH)
 
     try:
         # Prepare ChatML sample
@@ -483,18 +480,6 @@ def main():
 
     parser = argparse.ArgumentParser(description="Gradio UI for Text-to-Speech using HiggsAudioServeEngine")
     parser.add_argument(
-        "--model-path",
-        type=str,
-        default=DEFAULT_MODEL_PATH,
-        help="Path to the Higgs Audio model.",
-    )
-    parser.add_argument(
-        "--audio-tokenizer-path",
-        type=str,
-        default=DEFAULT_AUDIO_TOKENIZER_PATH,
-        help="Path to the audio tokenizer.",
-    )
-    parser.add_argument(
         "--device",
         type=str,
         default="cuda",
@@ -507,13 +492,10 @@ def main():
     args = parser.parse_args()
 
     # Update default values if provided via command line
-    DEFAULT_MODEL_PATH = args.model_path
-    DEFAULT_AUDIO_TOKENIZER_PATH = args.audio_tokenizer_path
     VOICE_PRESETS = load_voice_presets()
 
     # Load model on startup
-    logger.info("Loading model...")
-    result = initialize_engine(args.model_path, args.audio_tokenizer_path, args.device)
+    result = initialize_engine(DEFAULT_MODEL_PATH, DEFAULT_AUDIO_TOKENIZER_PATH)
 
     # Exit if model loading failed
     if not result:
