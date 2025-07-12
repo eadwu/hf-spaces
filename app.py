@@ -24,10 +24,6 @@ from higgs_audio.data_types import ChatMLSample, AudioContent, Message
 # Global engine instance
 engine = None
 
-# Set up default paths and resources
-EXAMPLES_DIR = os.path.join(os.path.dirname(__file__), "examples")
-os.makedirs(EXAMPLES_DIR, exist_ok=True)
-
 # Default model configuration
 DEFAULT_MODEL_PATH = "bosonai/higgs-audio-v2-generation-3B-staging"
 DEFAULT_AUDIO_TOKENIZER_PATH = "bosonai/higgs-audio-v2-tokenizer-staging"
@@ -44,7 +40,16 @@ DEFAULT_STOP_STRINGS = ["<|end_of_text|>", "<|eot_id|>"]
 
 # Predefined examples for system and input messages
 PREDEFINED_EXAMPLES = {
-    "None": {"system_prompt": "", "input_text": "", "description": "Default example"},
+    "voice-clone": {
+        "system_prompt": "",
+        "input_text": "Hey there! I'm your friendly voice twin in the making. Pick a voice preset below or upload your own audio - let's clone some vocals and bring your voice to life! ",
+        "description": "Voice clone template",
+    },
+    "zero-shot": {
+        "system_prompt": DEFAULT_SYSTEM_PROMPT,
+        "input_text": "Hey hey! Welcome to Higgs Audio, your voice's new best friend. Drop your text below, and I'll turn it into something that sounds awesome! Let's make some audio magic!",
+        "description": "Zero-shot template",
+    },
     "multispeaker-interleave": {
         "system_prompt": "Generate audio following instruction.\n\n"
         "<|scene_desc_start|>\n"
@@ -55,7 +60,7 @@ PREDEFINED_EXAMPLES = {
         "input_text": "<|generation_instruction_start|>\nGenerate interleaved transcript and audio that lasts for around 10 seconds.\n<|generation_instruction_end|>",
         "description": "Multispeaker interleave example",
     },
-    "single-speaker": {
+    "single-speaker-accent": {
         "system_prompt": "Generate audio following instruction.\n\n"
         "<|scene_desc_start|>\n"
         "SPEAKER0: british accent\n"
@@ -316,9 +321,9 @@ def create_ui():
             with gr.Column(scale=2):
                 # Template selection dropdown
                 template_dropdown = gr.Dropdown(
-                    label="Message examples",
+                    label="TTS Template",
                     choices=list(PREDEFINED_EXAMPLES.keys()),
-                    value="None",
+                    value="zero-shot",
                     info="Select a predefined example for system and input messages. Voice preset will be set to EMPTY when a example is selected.",
                 )
 
@@ -339,9 +344,13 @@ def create_ui():
                     label="Voice Preset",
                     choices=list(VOICE_PRESETS.keys()),
                     value="EMPTY",
+                    interactive=False,  # Disabled by default since default template is not voice-clone
+                    visible=False,
                 )
 
-                with gr.Accordion("Custom Reference (Optional)", open=False):
+                with gr.Accordion(
+                    "Custom Reference (Optional)", open=False, visible=False
+                ) as custom_reference_accordion:
                     reference_audio = gr.Audio(label="Reference Audio", type="filepath")
                     reference_text = gr.TextArea(
                         label="Reference Text (transcript of the reference audio)",
@@ -423,13 +432,23 @@ def create_ui():
         def apply_template(template_name):
             if template_name in PREDEFINED_EXAMPLES:
                 template = PREDEFINED_EXAMPLES[template_name]
+                # Enable voice preset and custom reference only for voice-clone template
+                is_voice_clone = template_name == "voice-clone"
                 return (
                     template["system_prompt"],  # system_prompt
                     template["input_text"],  # input_text
-                    "EMPTY",  # voice_preset (always set to EMPTY for examples)
+                    gr.update(
+                        value="wizard", interactive=is_voice_clone, visible=is_voice_clone
+                    ),  # voice_preset (value and interactivity)
+                    gr.update(visible=is_voice_clone),  # custom reference accordion visibility
+                    gr.update(visible=is_voice_clone),  # voice samples table visibility
+                    gr.update(visible=is_voice_clone),  # sample audio visibility
                 )
             else:
                 return (
+                    gr.update(),
+                    gr.update(),
+                    gr.update(),
                     gr.update(),
                     gr.update(),
                     gr.update(),
@@ -441,7 +460,14 @@ def create_ui():
         template_dropdown.change(
             fn=apply_template,
             inputs=[template_dropdown],
-            outputs=[system_prompt, input_text, voice_preset],
+            outputs=[
+                system_prompt,
+                input_text,
+                voice_preset,
+                custom_reference_accordion,
+                voice_samples_table,
+                sample_audio,
+            ],
         )
 
         # Connect submit button to the TTS function
