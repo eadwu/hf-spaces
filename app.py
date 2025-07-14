@@ -63,7 +63,7 @@ PREDEFINED_EXAMPLES = {
     "single-speaker-accent": {
         "system_prompt": "Generate audio following instruction.\n\n"
         "<|scene_desc_start|>\n"
-        "SPEAKER0: british accent\n"
+        "SPEAKER0: British accent;\n"
         "<|scene_desc_end|>",
         "input_text": "Hey, everyone! Welcome back to Tech Talk Tuesdays.\n"
         "It's your host, Alex, and today, we're diving into a topic that's become absolutely crucial in the tech world — deep learning.\n"
@@ -275,7 +275,7 @@ def text_to_speech(
 
 
 def create_ui():
-    my_theme = "JohnSmith9982/small_and_pretty"
+    my_theme = gr.Theme.load("theme.json")
 
     # Add custom CSS to disable focus highlighting on textboxes
     custom_css = """
@@ -312,6 +312,8 @@ def create_ui():
     }
     """
 
+    default_template = "zero-shot"
+
     """Create the Gradio UI."""
     with gr.Blocks(theme=my_theme, css=custom_css) as demo:
         gr.Markdown("# Higgs Audio Text-to-Speech Playground")
@@ -323,20 +325,21 @@ def create_ui():
                 template_dropdown = gr.Dropdown(
                     label="TTS Template",
                     choices=list(PREDEFINED_EXAMPLES.keys()),
-                    value="zero-shot",
+                    value=default_template,
                     info="Select a predefined example for system and input messages. Voice preset will be set to EMPTY when a example is selected.",
                 )
 
                 system_prompt = gr.TextArea(
                     label="System Prompt",
                     placeholder="Enter system prompt to guide the model...",
-                    value=DEFAULT_SYSTEM_PROMPT,
+                    value=PREDEFINED_EXAMPLES[default_template]["system_prompt"],
                     lines=2,
                 )
 
                 input_text = gr.TextArea(
                     label="Input Text",
                     placeholder="Type the text you want to convert to speech...",
+                    value=PREDEFINED_EXAMPLES[default_template]["input_text"],
                     lines=5,
                 )
 
@@ -396,14 +399,14 @@ def create_ui():
                 stop_btn = gr.Button("Stop Playback", variant="primary")
 
         # Example voice
-        with gr.Row():
+        with gr.Row(visible=False) as voice_samples_section:
             voice_samples_table = gr.Dataframe(
                 headers=["Voice Preset", "Sample Text"],
                 datatype=["str", "str"],
                 value=[[preset, text] for preset, text in VOICE_PRESETS.items() if preset != "EMPTY"],
                 interactive=False,
             )
-            sample_audio = gr.Audio(label="Voice Sample", visible=True)
+            sample_audio = gr.Audio(label="Voice Sample")
 
         # Function to play voice sample when clicking on a row
         def play_voice_sample(evt: gr.SelectData):
@@ -434,19 +437,18 @@ def create_ui():
                 template = PREDEFINED_EXAMPLES[template_name]
                 # Enable voice preset and custom reference only for voice-clone template
                 is_voice_clone = template_name == "voice-clone"
+                voice_preset_value = "wizard" if is_voice_clone else "EMPTY"
                 return (
                     template["system_prompt"],  # system_prompt
                     template["input_text"],  # input_text
                     gr.update(
-                        value="wizard", interactive=is_voice_clone, visible=is_voice_clone
+                        value=voice_preset_value, interactive=is_voice_clone, visible=is_voice_clone
                     ),  # voice_preset (value and interactivity)
                     gr.update(visible=is_voice_clone),  # custom reference accordion visibility
-                    gr.update(visible=is_voice_clone),  # voice samples table visibility
-                    gr.update(visible=is_voice_clone),  # sample audio visibility
+                    gr.update(visible=is_voice_clone),  # voice samples section visibility
                 )
             else:
                 return (
-                    gr.update(),
                     gr.update(),
                     gr.update(),
                     gr.update(),
@@ -465,8 +467,7 @@ def create_ui():
                 input_text,
                 voice_preset,
                 custom_reference_accordion,
-                voice_samples_table,
-                sample_audio,
+                voice_samples_section,
             ],
         )
 
@@ -519,16 +520,6 @@ def main():
 
     # Update default values if provided via command line
     VOICE_PRESETS = load_voice_presets()
-
-    # Load model on startup
-    result = initialize_engine(DEFAULT_MODEL_PATH, DEFAULT_AUDIO_TOKENIZER_PATH)
-
-    # Exit if model loading failed
-    if not result:
-        logger.error("Failed to load model. Exiting.")
-        return
-
-    logger.info(f"Model loaded: {DEFAULT_MODEL_PATH}")
 
     # Create and launch the UI
     demo = create_ui()
