@@ -270,7 +270,7 @@ def prepare_chatml_sample(
     return ChatMLSample(messages=messages)
 
 
-@spaces.GPU(duration=500)
+@spaces.GPU(duration=120)
 def text_to_speech(
     text,
     voice_preset,
@@ -282,7 +282,7 @@ def text_to_speech(
     top_k=50,
     system_prompt=DEFAULT_SYSTEM_PROMPT,
     stop_strings=None,
-    ras_win_len=20,
+    ras_win_len=7,
     ras_win_max_num_repeat=2,
 ):
     """Convert text to speech using HiggsAudioServeEngine."""
@@ -457,7 +457,7 @@ def create_ui():
                     ras_win_len = gr.Slider(
                         minimum=0,
                         maximum=10,
-                        value=0,
+                        value=7,
                         step=1,
                         label="RAS Window Length",
                         info="Window length for repetition avoidance sampling",
