@@ -90,7 +90,7 @@ PREDEFINED_EXAMPLES = {
     "single-speaker-bgm": {
         "system_prompt": DEFAULT_SYSTEM_PROMPT,
         "input_text": "<SE_s>[Music]</SE_s> I will remember this, thought Ender, when I am defeated. To keep dignity, and give honor where it's due, so that defeat is not disgrace. And I hope I don't have to do it often. <SE_e>[Music]</SE_e>",
-        "description": "Single speaker with BGM using music tag. This is an experimental feature and may need to try multiple times to get the best result.",
+        "description": "Single speaker with BGM using music tag. This is an experimental feature and you may need to try multiple times to get the best result.",
     },
 }
 
@@ -127,7 +127,7 @@ def load_voice_presets():
         return {"EMPTY": "No reference voice"}
 
 
-def get_voice_present(voice_preset):
+def get_voice_preset(voice_preset):
     """Get the voice path and text for a given voice preset."""
     voice_path = os.path.join(os.path.dirname(__file__), "voice_examples", f"{voice_preset}.wav")
     if not os.path.exists(voice_path):
@@ -225,7 +225,7 @@ def process_text_output(text_output: str):
 
 
 def prepare_chatml_sample(
-    voice_present: str,
+    voice_preset: str,
     text: str,
     reference_audio: Optional[str] = None,
     reference_text: Optional[str] = None,
@@ -246,11 +246,11 @@ def prepare_chatml_sample(
         # Custom reference audio
         audio_base64 = encode_audio_file(reference_audio)
         ref_text = reference_text or ""
-    elif voice_present != "EMPTY":
+    elif voice_preset != "EMPTY":
         # Voice preset
-        voice_path, ref_text = get_voice_present(voice_present)
+        voice_path, ref_text = get_voice_preset(voice_preset)
         if voice_path is None:
-            logger.warning(f"Voice preset {voice_present} not found, skipping reference audio")
+            logger.warning(f"Voice preset {voice_preset} not found, skipping reference audio")
         else:
             audio_base64 = encode_audio_file(voice_path)
 
@@ -396,7 +396,7 @@ def create_ui():
                     label="TTS Template",
                     choices=list(PREDEFINED_EXAMPLES.keys()),
                     value=default_template,
-                    info="Select a predefined example for system and input messages. Voice preset will be set to EMPTY when a example is selected.",
+                    info="Select a predefined example for system and input messages.",
                 )
 
                 # Template description display
@@ -507,7 +507,7 @@ def create_ui():
                 preset_names = [preset for preset in VOICE_PRESETS.keys() if preset != "EMPTY"]
                 if evt.index[0] < len(preset_names):
                     preset = preset_names[evt.index[0]]
-                    voice_path, _ = get_voice_present(preset)
+                    voice_path, _ = get_voice_preset(preset)
                     if voice_path and os.path.exists(voice_path):
                         return voice_path
                     else:
