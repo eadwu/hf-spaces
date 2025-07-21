@@ -25,8 +25,8 @@ from higgs_audio.data_types import ChatMLSample, AudioContent, Message
 engine = None
 
 # Default model configuration
-DEFAULT_MODEL_PATH = "bosonai/higgs-audio-v2-generation-3B-staging"
-DEFAULT_AUDIO_TOKENIZER_PATH = "bosonai/higgs-audio-v2-tokenizer-staging"
+DEFAULT_MODEL_PATH = "bosonai/higgs-audio-v2-generation-3B-base"
+DEFAULT_AUDIO_TOKENIZER_PATH = "bosonai/higgs-audio-v2-tokenizer"
 SAMPLE_RATE = 24000
 
 DEFAULT_SYSTEM_PROMPT = (
@@ -43,46 +43,54 @@ PREDEFINED_EXAMPLES = {
     "voice-clone": {
         "system_prompt": "",
         "input_text": "Hey there! I'm your friendly voice twin in the making. Pick a voice preset below or upload your own audio - let's clone some vocals and bring your voice to life! ",
-        "description": "Voice clone template",
+        "description": "Voice clone to clone the reference audio. Leave the system prompt empty.",
     },
-    "zero-shot": {
+    "smart-voice": {
         "system_prompt": DEFAULT_SYSTEM_PROMPT,
-        "input_text": "Hey hey! Welcome to Higgs Audio, your voice's new best friend. Drop your text below, and I'll turn it into something that sounds awesome! Let's make some audio magic!",
-        "description": "Zero-shot template",
+        "input_text": "The sun rises in the east and sets in the west. This simple fact has been observed by humans for thousands of years.",
+        "description": "Smart voice to generate speech based on the context",
     },
-    "multispeaker-interleave": {
-        "system_prompt": "Generate audio following instruction.\n\n"
+    "multispeaker-voice-description": {
+        "system_prompt": "You are an AI assistant designed to convert text into speech.\n"
+        "If the user's message includes a [SPEAKER*] tag, do not read out the tag and generate speech for the following text, using the specified voice.\n"
+        "If no speaker tag is present, select a suitable voice on your own.\n\n"
         "<|scene_desc_start|>\n"
-        "SPEAKER0: vocal fry;feminism;slightly fast\n"
-        "SPEAKER1: masculine;moderate;moderate pitch;monotone;mature\n"
-        "In this scene, a group of adventurers is debating whether to investigate a potentially dangerous situation.\n"
+        "SPEAKER0: feminine\n"
+        "SPEAKER1: masculine\n"
         "<|scene_desc_end|>",
-        "input_text": "<|generation_instruction_start|>\nGenerate interleaved transcript and audio that lasts for around 10 seconds.\n<|generation_instruction_end|>",
-        "description": "Multispeaker interleave example",
+        "input_text": "[SPEAKER0] I can't believe you did that without even asking me first!\n"
+        "[SPEAKER1] Oh, come on! It wasn't a big deal, and I knew you would overreact like this.\n"
+        "[SPEAKER0] Overreact? You made a decision that affects both of us without even considering my opinion!\n"
+        "[SPEAKER1] Because I didn't have time to sit around waiting for you to make up your mind! Someone had to act.",
+        "description": "Multispeaker with different voice descriptions in the system prompt",
     },
-    "single-speaker-accent": {
+    "single-speaker-voice-description": {
         "system_prompt": "Generate audio following instruction.\n\n"
         "<|scene_desc_start|>\n"
-        "SPEAKER0: British accent;\n"
+        "SPEAKER0: He speaks with a clear British accent and a conversational, inquisitive tone. His delivery is articulate and at a moderate pace, and very clear audio.\n"
         "<|scene_desc_end|>",
         "input_text": "Hey, everyone! Welcome back to Tech Talk Tuesdays.\n"
         "It's your host, Alex, and today, we're diving into a topic that's become absolutely crucial in the tech world — deep learning.\n"
         "And let's be honest, if you've been even remotely connected to tech, AI, or machine learning lately, you know that deep learning is everywhere.\n"
         "\n"
         "So here's the big question: Do you want to understand how deep learning works?\n",
-        "description": "Single speaker example",
+        "description": "Single speaker with voice description in the system prompt",
     },
     "single-speaker-zh": {
         "system_prompt": "Generate audio following instruction.\n\n"
         "<|scene_desc_start|>\n"
-        "\nAudio is recorded from a quiet room.\n"
-        "\nSPEAKER0: feminine\n"
+        "Audio is recorded from a quiet room.\n"
         "<|scene_desc_end|>",
         "input_text": "大家好, 欢迎收听本期的跟李沐学AI. 今天沐哥在忙着洗数据, 所以由我, 希格斯主播代替他讲这期视频.\n"
         "今天我们要聊的是一个你绝对不能忽视的话题: 多模态学习.\n"
         "那么, 问题来了, 你真的了解多模态吗? 你知道如何自己动手构建多模态大模型吗.\n"
         "或者说, 你能察觉到我其实是个机器人吗?",
-        "description": "Single speaker with Chinese text",
+        "description": "Single speaker speaking Chinese",
+    },
+    "single-speaker-bgm": {
+        "system_prompt": DEFAULT_SYSTEM_PROMPT,
+        "input_text": "<SE_s>[Music]</SE_s> I will remember this, thought Ender, when I am defeated. To keep dignity, and give honor where it's due, so that defeat is not disgrace. And I hope I don't have to do it often. <SE_e>[Music]</SE_e>",
+        "description": "Single speaker with BGM using music tag. This is an experimental feature and may need to try multiple times to get the best result.",
     },
 }
 
@@ -128,6 +136,62 @@ def get_voice_present(voice_preset):
 
     text = VOICE_PRESETS.get(voice_preset, "No transcript available")
     return voice_path, text
+
+
+def normalize_chinese_punctuation(text):
+    """
+    Convert Chinese (full-width) punctuation marks to English (half-width) equivalents.
+    """
+    # Mapping of Chinese punctuation to English punctuation
+    chinese_to_english_punct = {
+        "，": ", ",  # comma
+        "。": ".",  # period
+        "：": ":",  # colon
+        "；": ";",  # semicolon
+        "？": "?",  # question mark
+        "！": "!",  # exclamation mark
+        "（": "(",  # left parenthesis
+        "）": ")",  # right parenthesis
+        "【": "[",  # left square bracket
+        "】": "]",  # right square bracket
+        "《": "<",  # left angle quote
+        "》": ">",  # right angle quote
+        "“": '"',  # left double quotation
+        "”": '"',  # right double quotation
+        "‘": "'",  # left single quotation
+        "’": "'",  # right single quotation
+        "、": ",",  # enumeration comma
+        "—": "-",  # em dash
+        "…": "...",  # ellipsis
+        "·": ".",  # middle dot
+        "「": '"',  # left corner bracket
+        "」": '"',  # right corner bracket
+        "『": '"',  # left double corner bracket
+        "』": '"',  # right double corner bracket
+    }
+
+    # Replace each Chinese punctuation with its English counterpart
+    for zh_punct, en_punct in chinese_to_english_punct.items():
+        text = text.replace(zh_punct, en_punct)
+
+    return text
+
+
+def normalize_text(transcript: str):
+    transcript = normalize_chinese_punctuation(transcript)
+    # Other normalizations (e.g., parentheses and other symbols. Will be improved in the future)
+    transcript = transcript.replace("(", " ")
+    transcript = transcript.replace(")", " ")
+    transcript = transcript.replace("°F", " degrees Fahrenheit")
+    transcript = transcript.replace("°C", " degrees Celsius")
+    lines = transcript.split("\n")
+    transcript = "\n".join([" ".join(line.split()) for line in lines if line.strip()])
+    transcript = transcript.strip()
+
+    if not any([transcript.endswith(c) for c in [".", "!", "?", ",", ";", '"', "'", "</SE_e>", "</SE>"]]):
+        transcript += "."
+
+    return transcript
 
 
 @spaces.GPU
@@ -200,6 +264,7 @@ def prepare_chatml_sample(
         messages.append(Message(role="assistant", content=[audio_content]))
 
     # Add the main user message
+    text = normalize_text(text)
     messages.append(Message(role="user", content=text))
 
     return ChatMLSample(messages=messages)
@@ -217,6 +282,8 @@ def text_to_speech(
     top_k=50,
     system_prompt=DEFAULT_SYSTEM_PROMPT,
     stop_strings=None,
+    ras_win_len=20,
+    ras_win_max_num_repeat=2,
 ):
     """Convert text to speech using HiggsAudioServeEngine."""
     global engine
@@ -237,7 +304,8 @@ def text_to_speech(
         request_id = f"tts-playground-{str(uuid.uuid4())}"
         logger.info(
             f"{request_id}: Generating speech for text: {text[:100]}..., \n"
-            f"with parameters: temperature={temperature}, top_p={top_p}, top_k={top_k}, stop_list={stop_list}"
+            f"with parameters: temperature={temperature}, top_p={top_p}, top_k={top_k}, stop_list={stop_list}, "
+            f"ras_win_len={ras_win_len}, ras_win_max_num_repeat={ras_win_max_num_repeat}"
         )
         start_time = time.time()
 
@@ -249,6 +317,8 @@ def text_to_speech(
             top_k=top_k if top_k > 0 else None,
             top_p=top_p,
             stop_strings=stop_list,
+            ras_win_len=ras_win_len if ras_win_len > 0 else None,
+            ras_win_max_num_repeat=max(ras_win_len, ras_win_max_num_repeat),
         )
 
         generation_time = time.time() - start_time
@@ -312,7 +382,7 @@ def create_ui():
     }
     """
 
-    default_template = "zero-shot"
+    default_template = "smart-voice"
 
     """Create the Gradio UI."""
     with gr.Blocks(theme=my_theme, css=custom_css) as demo:
@@ -327,6 +397,12 @@ def create_ui():
                     choices=list(PREDEFINED_EXAMPLES.keys()),
                     value=default_template,
                     info="Select a predefined example for system and input messages. Voice preset will be set to EMPTY when a example is selected.",
+                )
+
+                # Template description display
+                template_description = gr.HTML(
+                    value=f'<p style="font-size: 0.85em; color: var(--body-text-color-subdued); margin: 0; padding: 0;"> {PREDEFINED_EXAMPLES[default_template]["description"]}</p>',
+                    visible=True,
                 )
 
                 system_prompt = gr.TextArea(
@@ -378,6 +454,22 @@ def create_ui():
                     )
                     top_p = gr.Slider(minimum=0.1, maximum=1.0, value=0.95, step=0.05, label="Top P")
                     top_k = gr.Slider(minimum=-1, maximum=100, value=50, step=1, label="Top K")
+                    ras_win_len = gr.Slider(
+                        minimum=0,
+                        maximum=10,
+                        value=0,
+                        step=1,
+                        label="RAS Window Length",
+                        info="Window length for repetition avoidance sampling",
+                    )
+                    ras_win_max_num_repeat = gr.Slider(
+                        minimum=1,
+                        maximum=10,
+                        value=2,
+                        step=1,
+                        label="RAS Max Num Repeat",
+                        info="Maximum number of repetitions allowed in the window",
+                    )
                     # Add stop strings component
                     stop_strings = gr.Dataframe(
                         label="Stop Strings",
@@ -437,10 +529,12 @@ def create_ui():
                 template = PREDEFINED_EXAMPLES[template_name]
                 # Enable voice preset and custom reference only for voice-clone template
                 is_voice_clone = template_name == "voice-clone"
-                voice_preset_value = "wizard" if is_voice_clone else "EMPTY"
+                voice_preset_value = "belinda" if is_voice_clone else "EMPTY"
+                description_text = f'<p style="font-size: 0.85em; color: var(--body-text-color-subdued); margin: 0; padding: 0;"> {template["description"]}</p>'
                 return (
                     template["system_prompt"],  # system_prompt
                     template["input_text"],  # input_text
+                    description_text,  # template_description
                     gr.update(
                         value=voice_preset_value, interactive=is_voice_clone, visible=is_voice_clone
                     ),  # voice_preset (value and interactivity)
@@ -449,6 +543,7 @@ def create_ui():
                 )
             else:
                 return (
+                    gr.update(),
                     gr.update(),
                     gr.update(),
                     gr.update(),
@@ -465,6 +560,7 @@ def create_ui():
             outputs=[
                 system_prompt,
                 input_text,
+                template_description,
                 voice_preset,
                 custom_reference_accordion,
                 voice_samples_section,
@@ -485,6 +581,8 @@ def create_ui():
                 top_k,
                 system_prompt,
                 stop_strings,
+                ras_win_len,
+                ras_win_max_num_repeat,
             ],
             outputs=[output_text, output_audio],
             api_name="generate_speech",

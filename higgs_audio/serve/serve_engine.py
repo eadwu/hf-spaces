@@ -27,6 +27,45 @@ from ..data_collator.higgs_audio_collator import HiggsAudioSampleCollator
 from ..audio_processing.higgs_audio_tokenizer import load_higgs_audio_tokenizer
 
 
+def normalize_chinese_punctuation(text):
+    """
+    Convert Chinese (full-width) punctuation marks to English (half-width) equivalents.
+    """
+    # Mapping of Chinese punctuation to English punctuation
+    chinese_to_english_punct = {
+        "，": ",",  # comma
+        "。": ".",  # period
+        "：": ":",  # colon
+        "；": ";",  # semicolon
+        "？": "?",  # question mark
+        "！": "!",  # exclamation mark
+        "（": "(",  # left parenthesis
+        "）": ")",  # right parenthesis
+        "【": "[",  # left square bracket
+        "】": "]",  # right square bracket
+        "《": "<",  # left angle quote
+        "》": ">",  # right angle quote
+        "“": '"',  # left double quotation
+        "”": '"',  # right double quotation
+        "‘": "'",  # left single quotation
+        "’": "'",  # right single quotation
+        "、": ",",  # enumeration comma
+        "—": "-",  # em dash
+        "…": "...",  # ellipsis
+        "·": ".",  # middle dot
+        "「": '"',  # left corner bracket
+        "」": '"',  # right corner bracket
+        "『": '"',  # left double corner bracket
+        "』": '"',  # right double corner bracket
+    }
+
+    # Replace each Chinese punctuation with its English counterpart
+    for zh_punct, en_punct in chinese_to_english_punct.items():
+        text = text.replace(zh_punct, en_punct)
+
+    return text
+
+
 @dataclass
 class HiggsAudioStreamerDelta:
     """Represents a chunk of generated content, either text or audio tokens."""
@@ -422,3 +461,14 @@ class HiggsAudioServeEngine:
                     "cached_tokens": 0,
                 },
             )
+
+    def text_normalize(self, text: str) -> str:
+        """
+        Normalize the text.
+        """
+        # Perform some basic normalization
+        text = normalize_chinese_punctuation(text)
+        # Handle parentheses
+        text = text.replace("(", " ")
+        text = text.replace(")", " ")
+        return text
