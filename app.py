@@ -89,7 +89,7 @@ PREDEFINED_EXAMPLES = {
     },
     "single-speaker-bgm": {
         "system_prompt": DEFAULT_SYSTEM_PROMPT,
-        "input_text": "<SE_s>[Music]</SE_s> I will remember this, thought Ender, when I am defeated. To keep dignity, and give honor where it's due, so that defeat is not disgrace. And I hope I don't have to do it often. <SE_e>[Music]</SE_e>",
+        "input_text": "[music start] I will remember this, thought Ender, when I am defeated. To keep dignity, and give honor where it's due, so that defeat is not disgrace. And I hope I don't have to do it often. [music end]",
         "description": "Single speaker with BGM using music tag. This is an experimental feature and you may need to try multiple times to get the best result.",
     },
 }
@@ -184,6 +184,22 @@ def normalize_text(transcript: str):
     transcript = transcript.replace(")", " ")
     transcript = transcript.replace("°F", " degrees Fahrenheit")
     transcript = transcript.replace("°C", " degrees Celsius")
+
+    for tag, replacement in [
+        ("[laugh]", "<SE>[Laughter]</SE>"),
+        ("[humming start]", "<SE>[Humming]</SE>"),
+        ("[humming end]", "<SE_e>[Humming]</SE_e>"),
+        ("[music start]", "<SE_s>[Music]</SE_s>"),
+        ("[music end]", "<SE_e>[Music]</SE_e>"),
+        ("[music]", "<SE>[Music]</SE>"),
+        ("[sing start]", "<SE_s>[Singing]</SE_s>"),
+        ("[sing end]", "<SE_e>[Singing]</SE_e>"),
+        ("[applause]", "<SE>[Applause]</SE>"),
+        ("[cheering]", "<SE>[Cheering]</SE>"),
+        ("[cough]", "<SE>[Cough]</SE>"),
+    ]:
+        transcript = transcript.replace(tag, replacement)
+
     lines = transcript.split("\n")
     transcript = "\n".join([" ".join(line.split()) for line in lines if line.strip()])
     transcript = transcript.strip()
@@ -530,6 +546,8 @@ def create_ui():
                 # Enable voice preset and custom reference only for voice-clone template
                 is_voice_clone = template_name == "voice-clone"
                 voice_preset_value = "belinda" if is_voice_clone else "EMPTY"
+                # Set ras_win_len to 0 for single-speaker-bgm, 7 for others
+                ras_win_len_value = 0 if template_name == "single-speaker-bgm" else 7
                 description_text = f'<p style="font-size: 0.85em; color: var(--body-text-color-subdued); margin: 0; padding: 0;"> {template["description"]}</p>'
                 return (
                     template["system_prompt"],  # system_prompt
@@ -540,9 +558,11 @@ def create_ui():
                     ),  # voice_preset (value and interactivity)
                     gr.update(visible=is_voice_clone),  # custom reference accordion visibility
                     gr.update(visible=is_voice_clone),  # voice samples section visibility
+                    ras_win_len_value,  # ras_win_len
                 )
             else:
                 return (
+                    gr.update(),
                     gr.update(),
                     gr.update(),
                     gr.update(),
@@ -564,6 +584,7 @@ def create_ui():
                 voice_preset,
                 custom_reference_accordion,
                 voice_samples_section,
+                ras_win_len,
             ],
         )
 
