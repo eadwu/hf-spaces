@@ -212,7 +212,16 @@ def normalize_text(transcript: str):
 
 @spaces.GPU
 def initialize_engine(model_path, audio_tokenizer_path) -> bool:
-    """Initialize the HiggsAudioServeEngine."""
+    """
+    Initialize the HiggsAudioServeEngine with the specified model and tokenizer.
+    
+    Args:
+        model_path: Path to the model to load
+        audio_tokenizer_path: Path to the audio tokenizer to load
+        
+    Returns:
+        True if initialization was successful, False otherwise
+    """
     global engine
     try:
         logger.info(f"Initializing engine with model: {model_path} and audio tokenizer: {audio_tokenizer_path}")
@@ -301,7 +310,26 @@ def text_to_speech(
     ras_win_len=7,
     ras_win_max_num_repeat=2,
 ):
-    """Convert text to speech using HiggsAudioServeEngine."""
+    """
+    Convert text to speech using HiggsAudioServeEngine.
+    
+    Args:
+        text: The text to convert to speech
+        voice_preset: The voice preset to use (or "EMPTY" for no preset)
+        reference_audio: Optional path to reference audio file
+        reference_text: Optional transcript of the reference audio
+        max_completion_tokens: Maximum number of tokens to generate
+        temperature: Sampling temperature for generation
+        top_p: Top-p sampling parameter
+        top_k: Top-k sampling parameter
+        system_prompt: System prompt to guide the model
+        stop_strings: Dataframe containing stop strings
+        ras_win_len: Window length for repetition avoidance sampling
+        ras_win_max_num_repeat: Maximum number of repetitions allowed in the window
+        
+    Returns:
+        Tuple of (generated_text, (sample_rate, audio_data)) where audio_data is int16 numpy array
+    """
     global engine
 
     if engine is None:
@@ -518,6 +546,15 @@ def create_ui():
 
         # Function to play voice sample when clicking on a row
         def play_voice_sample(evt: gr.SelectData):
+            """
+            Play a voice sample when a row is clicked in the voice samples table.
+            
+            Args:
+                evt: The select event containing the clicked row index
+                
+            Returns:
+                Path to the voice sample audio file, or None if not found
+            """
             try:
                 # Get the preset name from the clicked row
                 preset_names = [preset for preset in VOICE_PRESETS.keys() if preset != "EMPTY"]
@@ -541,6 +578,16 @@ def create_ui():
 
         # Function to handle template selection
         def apply_template(template_name):
+            """
+            Apply a predefined template to the UI components.
+            
+            Args:
+                template_name: Name of the template to apply
+                
+            Returns:
+                Tuple of updated values for system_prompt, input_text, template_description,
+                voice_preset, custom_reference_accordion, voice_samples_section, and ras_win_len
+            """
             if template_name in PREDEFINED_EXAMPLES:
                 template = PREDEFINED_EXAMPLES[template_name]
                 # Enable voice preset and custom reference only for voice-clone template
@@ -642,7 +689,7 @@ def main():
 
     # Create and launch the UI
     demo = create_ui()
-    demo.launch(server_name=args.host, server_port=args.port)
+    demo.launch(server_name=args.host, server_port=args.port, mcp_server=True)
 
 
 if __name__ == "__main__":
