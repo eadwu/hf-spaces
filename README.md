@@ -7,7 +7,7 @@ sdk: gradio
 sdk_version: 5.34.1
 app_file: webui.py
 pinned: false
-license: GPL-3.0
+license: gpl-3.0
 preload_from_hub:
   - IndexTeam/IndexTTS-2
   - amphion/MaskGCT
