@@ -25,7 +25,6 @@ parser.add_argument("--model_dir", type=str, default="checkpoints", help="Model 
 parser.add_argument("--is_fp16", action="store_true", default=False, help="Fp16 infer")
 cmd_args = parser.parse_args()
 from huggingface_hub import snapshot_download
-os.environ['HF_HUB_CACHE'] = './checkpoints/hf_cache'
 snapshot_download(repo_id="IndexTeam/IndexTTS-2", local_dir="./checkpoints")
 
 if not os.path.exists(cmd_args.model_dir):
