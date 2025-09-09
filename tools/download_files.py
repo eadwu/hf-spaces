@@ -90,10 +90,15 @@ def download_model_from_huggingface(destination,hf_cache_dir):
     os.makedirs(os.path.join(hf_cache_dir, "models--nvidia--bigvgan_v2_22khz_80band_256x"), exist_ok=True)
     os.makedirs(os.path.join(hf_cache_dir,"models--funasr--campplus"), exist_ok=True)
     snapshot_download("IndexTeam/IndexTTS-2", local_dir=destination)
+    print("[HuggingFace] IndexTTS-2 Download finished")
     snapshot_download("amphion/MaskGCT", local_dir=os.path.join(hf_cache_dir,"models--amphion--MaskGCT"))
+    print("[HuggingFace] MaskGCT Download finished")
     snapshot_download("facebook/w2v-bert-2.0",local_dir=os.path.join(hf_cache_dir,"models--facebook--w2v-bert-2.0"))
+    print("[HuggingFace] w2v-bert-2.0 Download finished")
     snapshot_download("nvidia/bigvgan_v2_22khz_80band_256x",local_dir=os.path.join(hf_cache_dir, "models--nvidia--bigvgan_v2_22khz_80band_256x"))
+    print("[HuggingFace] bigvgan_v2_22khz_80band_256x Download finished")
     snapshot_download("funasr/campplus",local_dir=os.path.join(hf_cache_dir,"models--funasr--campplus"))
+    print("[HuggingFace] campplus Download finished")
 
 # 使用示例
 if __name__ == "__main__":
