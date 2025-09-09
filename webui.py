@@ -38,7 +38,9 @@ from modelscope.hub import api
 
 i18n = I18nAuto(language="Auto")
 MODE = 'local'
-tts = IndexTTS2(model_dir=cmd_args.model_dir, cfg_path=os.path.join(cmd_args.model_dir, "config.yaml"),is_fp16=cmd_args.is_fp16)
+tts = IndexTTS2(model_dir=cmd_args.model_dir,
+                cfg_path=os.path.join(cmd_args.model_dir, "config.yaml"),
+                is_fp16=False,use_cuda_kernel=False)
 
 # 支持的语言列表
 LANGUAGES = {
