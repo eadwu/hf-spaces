@@ -26,23 +26,8 @@ parser.add_argument("--is_fp16", action="store_true", default=False, help="Fp16 
 cmd_args = parser.parse_args()
 
 from tools.download_files import download_model_from_huggingface
-download_model_from_huggingface("checkpoints",os.path.join(current_dir, "hf_cache"))
-
-if not os.path.exists(cmd_args.model_dir):
-    print(f"Model directory {cmd_args.model_dir} does not exist. Please download the model first.")
-    sys.exit(1)
-
-for file in [
-    "bpe.model",
-    "gpt.pth",
-    "config.yaml",
-    "s2mel.pth",
-    "wav2vec2bert_stats.pt"
-]:
-    file_path = os.path.join(cmd_args.model_dir, file)
-    if not os.path.exists(file_path):
-        print(f"Required file {file_path} does not exist. Please download it.")
-        sys.exit(1)
+download_model_from_huggingface(os.path.join(current_dir,"checkpoints"),
+                                os.path.join(current_dir, "checkpoints","hf_cache"))
 
 import gradio as gr
 from indextts import infer
