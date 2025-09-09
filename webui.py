@@ -24,8 +24,9 @@ parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to run the
 parser.add_argument("--model_dir", type=str, default="checkpoints", help="Model checkpoints directory")
 parser.add_argument("--is_fp16", action="store_true", default=False, help="Fp16 infer")
 cmd_args = parser.parse_args()
-from huggingface_hub import snapshot_download
-snapshot_download(repo_id="IndexTeam/IndexTTS-2", local_dir="./checkpoints")
+
+from tools.download_files import download_model_from_huggingface
+download_model_from_huggingface("checkpoints",os.path.join(current_dir, "hf_cache"))
 
 if not os.path.exists(cmd_args.model_dir):
     print(f"Model directory {cmd_args.model_dir} does not exist. Please download the model first.")
