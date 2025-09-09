@@ -1,5 +1,6 @@
 import json
 import logging
+import spaces
 import os
 import sys
 import threading
@@ -79,7 +80,7 @@ with open("examples/cases.jsonl", "r", encoding="utf-8") as f:
                              example.get("emo_vec_8",0)]
                              )
 
-
+@spaces.GPU
 def gen_single(emo_control_method,prompt, text,
                emo_ref_path, emo_weight,
                vec1, vec2, vec3, vec4, vec5, vec6, vec7, vec8,

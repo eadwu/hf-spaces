@@ -25,6 +25,8 @@ sentencepiece
 gradio
 tqdm
 textstat
+huggingface_hub
+spaces
 
 WeTextProcessing; platform_machine != "Darwin"
 wetext; platform_system == "Darwin"
