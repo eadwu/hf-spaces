@@ -56,7 +56,7 @@ def save_response_content(response, destination, chunk_size=32768):
             if chunk: # 过滤掉保持连接的空白块
                 f.write(chunk)
 
-def download_model_from_modelscope(model_id, destination):
+def download_model_from_modelscope(destination,hf_cache_dir):
     """
     从ModelScope下载模型（伪代码，需根据实际API实现）
     Args:
@@ -65,7 +65,10 @@ def download_model_from_modelscope(model_id, destination):
     """
     print(f"[ModelScope] Downloading models to {destination},model cache dir={hf_cache_dir}")
     from modelscope import snapshot_download
-    os.makedirs(destination, exist_ok=True)
+    os.makedirs(os.path.join(hf_cache_dir, "models--amphion--MaskGCT"), exist_ok=True)
+    os.makedirs(os.path.join(hf_cache_dir, "models--facebook--w2v-bert-2.0"), exist_ok=True)
+    os.makedirs(os.path.join(hf_cache_dir, "models--nvidia--bigvgan_v2_22khz_80band_256x"), exist_ok=True)
+    os.makedirs(os.path.join(hf_cache_dir, "models--funasr--campplus"), exist_ok=True)
     snapshot_download("IndexTeam/IndexTTS-2", local_dir="checkpoints")
     snapshot_download("amphion/MaskGCT", local_dir="checkpoints/hf_cache/models--amphion--MaskGCT")
     snapshot_download("facebook/w2v-bert-2.0",local_dir="checkpoints/hf_cache/models--facebook--w2v-bert-2.0")
@@ -82,7 +85,10 @@ def download_model_from_huggingface(destination,hf_cache_dir):
     """
     print(f"[HuggingFace] Downloading models to {destination},model cache dir={hf_cache_dir}")
     from huggingface_hub import snapshot_download
-    os.makedirs(hf_cache_dir, exist_ok=True)
+    os.makedirs(os.path.join(hf_cache_dir,"models--amphion--MaskGCT"), exist_ok=True)
+    os.makedirs(os.path.join(hf_cache_dir,"models--facebook--w2v-bert-2.0"), exist_ok=True)
+    os.makedirs(os.path.join(hf_cache_dir, "models--nvidia--bigvgan_v2_22khz_80band_256x"), exist_ok=True)
+    os.makedirs(os.path.join(hf_cache_dir,"models--funasr--campplus"), exist_ok=True)
     snapshot_download("IndexTeam/IndexTTS-2", local_dir=destination)
     snapshot_download("amphion/MaskGCT", local_dir=os.path.join(hf_cache_dir,"models--amphion--MaskGCT"))
     snapshot_download("facebook/w2v-bert-2.0",local_dir=os.path.join(hf_cache_dir,"models--facebook--w2v-bert-2.0"))
