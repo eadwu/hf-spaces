@@ -1,3 +1,4 @@
+import spaces
 import json
 import os
 import sys
@@ -100,6 +101,7 @@ def normalize_emo_vec(emo_vec):
         tmp = tmp * 0.8/ np.sum(tmp)
     return tmp.tolist()
 
+@spaces.GPU
 def gen_single(emo_control_method,prompt, text,
                emo_ref_path, emo_weight,
                vec1, vec2, vec3, vec4, vec5, vec6, vec7, vec8,
