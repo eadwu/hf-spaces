@@ -47,3 +47,4 @@ examples/emo_hate.wav filter=lfs diff=lfs merge=lfs -text
 examples/voice_01.wav filter=lfs diff=lfs merge=lfs -text
 examples/voice_03.wav filter=lfs diff=lfs merge=lfs -text
 examples/voice_04.wav filter=lfs diff=lfs merge=lfs -text
+indextts/utils/maskgct/models/codec/facodec/modules/JDC/bst.t7 filter=lfs diff=lfs merge=lfs -text
