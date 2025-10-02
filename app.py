@@ -19,8 +19,8 @@ def infer(ref_text, ref_audio_path, gen_text):
     gr.Info("Encoding reference...")
     ref_codes = tts.encode_reference(ref_audio_path)
 
-    gr.Info(f"Generating audio for input text: {input_text}")
-    wav = tts.infer(input_text, ref_codes, ref_text)
+    gr.Info(f"Generating audio for input text: {gen_text}")
+    wav = tts.infer(gen_text, ref_codes, ref_text)
 
     return (24_000, wav)
 
