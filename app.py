@@ -28,7 +28,7 @@ demo = gr.Interface(
     fn=infer,
     inputs=[
         gr.Textbox(label="Reference Text"),
-        gr.Audio(source="upload", type="filepath", label="Reference Audio"),
+        gr.Audio(type="filepath", label="Reference Audio"),
         gr.Textbox(label="Text to Generate"),
     ],
     outputs=gr.Audio(type="numpy", label="Generated Speech"),
