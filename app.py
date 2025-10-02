@@ -1,4 +1,5 @@
 import spaces
+import os
 import sys
 sys.path.append("neutts-air")
 from neuttsair.neutts import NeuTTSAir
@@ -27,12 +28,12 @@ def infer(ref_text, ref_audio_path, gen_text):
 demo = gr.Interface(
     fn=infer,
     inputs=[
-        gr.Textbox(label="Reference Text"),
-        gr.Audio(type="filepath", label="Reference Audio"),
-        gr.Textbox(label="Text to Generate"),
+        gr.Textbox(label="Reference Text", value="So I'm live on radio. And I say, well, my dear friend James here clearly, and the whole room just froze. Turns out I'd completely misspoken and mentioned our other friend."),
+        gr.Audio(type="filepath", label="Reference Audio", value=os.path.join(os.getcwd(), "/neutts-air/samples/dave.wav")),
+        gr.Textbox(label="Text to Generate", value="My name is Dave, and um, I'm from London."),
     ],
     outputs=gr.Audio(type="numpy", label="Generated Speech"),
-    title="NeuTTS-Air",
+    title="NeuTTS-Air☁️",
     description="Upload a reference audio sample, provide the reference text, and enter new text to synthesize."
 )
 
