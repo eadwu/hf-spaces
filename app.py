@@ -32,12 +32,9 @@ def infer(ref_text, ref_audio_path, gen_text):
 demo = gr.Interface(
     fn=infer,
     inputs=[
-        gr.Textbox(label="Reference Text"),
-        gr.Audio(type="filepath", label="Reference Audio"),
-        gr.Textbox(label="Text to Generate"),
-    ],
-    examples=[
-        [DEFAULT_REF_TEXT, DEFAULT_REF_PATH, DEFAULT_GEN_TEXT]
+        gr.Textbox(label="Reference Text", value=DEFAULT_REF_TEXT),
+        gr.Audio(type="filepath", label="Reference Audio", value=DEFAULT_REF_PATH),
+        gr.Textbox(label="Text to Generate", value=DEFAULT_GEN_TEXT),
     ],
     outputs=gr.Audio(type="numpy", label="Generated Speech"),
     title="NeuTTS-Air☁️",
@@ -45,4 +42,4 @@ demo = gr.Interface(
 )
 
 if __name__ == "__main__":
-    demo.launch(allowed_paths=[SAMPLES_PATH])
+    demo.launch(allowed_paths=[SAMPLES_PATH], debug=True, inbrowser=True)
