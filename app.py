@@ -1,8 +1,8 @@
+import spaces
 import sys
 sys.path.append("neutts-air")
 from neuttsair.neutts import NeuTTSAir
 import gradio as gr
-import spaces
 
 # load model
 tts = NeuTTSAir(
