@@ -7,9 +7,9 @@ import gradio as gr
 # load model
 tts = NeuTTSAir(
     backbone_repo="neuphonic/neutts-air",
-    backbone_device="gpu",
+    backbone_device="cpu",
     codec_repo="neuphonic/neucodec",
-    codec_device="gpu"
+    codec_device="cpu"
 )
 
 @spaces.GPU()
