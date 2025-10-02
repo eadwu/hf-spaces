@@ -5,8 +5,9 @@ sys.path.append("neutts-air")
 from neuttsair.neutts import NeuTTSAir
 import gradio as gr
 
+SAMPLES_PATH = os.path.join(os.getwcwd(), "/neutts-air/samples/")
 DEFAULT_REF_TEXT = "So I'm live on radio. And I say, well, my dear friend James here clearly, and the whole room just froze. Turns out I'd completely misspoken and mentioned our other friend." 
-DEFAULT_REF_PATH = os.path.join(os.getcwd(), "/neutts-air/samples/dave.wav")
+DEFAULT_REF_PATH = os.path.join(SAMPLES_PATH, "dave.wav")
 DEFAULT_GEN_TEXT = "Hello, I'm NeuTTS-Air! How're you doing today?"
 
 tts = NeuTTSAir(
@@ -31,21 +32,14 @@ def infer(ref_text, ref_audio_path, gen_text):
 demo = gr.Interface(
     fn=infer,
     inputs=[
-        gr.Textbox(label="Reference Text"),
-        gr.Audio(type="filepath", label="Reference Audio"),
-        gr.Textbox(label="Text to Generate"),
+        gr.Textbox(label="Reference Text", value=DEFAULT_REF_TEXT),
+        gr.Audio(type="filepath", label="Reference Audio", value=DEFAULT_REF_PATH),
+        gr.Textbox(label="Text to Generate", value=DEFAULT_GEN_TEXT),
     ],
     outputs=gr.Audio(type="numpy", label="Generated Speech"),
-    examples=[
-        [
-            DEFAULT_REF_TEXT, 
-            DEFAULT_REF_PATH, 
-            DEFAULT_GEN_TEXT
-        ],
-    ],
     title="NeuTTS-Air☁️",
     description="Upload a reference audio sample, provide the reference text, and enter new text to synthesize."
 )
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(allowed_paths=[samples_path])
