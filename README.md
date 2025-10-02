@@ -9,3 +9,7 @@ app_file: app.py
 pinned: false
 license: apache-2.0
 ---
+
+HuggingFace 🤗: [Model](https://huggingface.co/neuphonic/neutts-air), [Q8 GGUF](https://huggingface.co/neuphonic/neutts-air-q8-gguf), [Q4 GGUF](https://huggingface.co/neuphonic/neutts-air-q4-gguf)
+
+Github: [Repo](https://github.com/neuphonic/neutts-air)
