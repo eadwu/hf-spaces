@@ -5,7 +5,7 @@ sys.path.append("neutts-air")
 from neuttsair.neutts import NeuTTSAir
 import gradio as gr
 
-SAMPLES_PATH = os.path.join(os.getwcwd(), "/neutts-air/samples/")
+SAMPLES_PATH = os.path.join(os.getcwd(), "/neutts-air/samples/")
 DEFAULT_REF_TEXT = "So I'm live on radio. And I say, well, my dear friend James here clearly, and the whole room just froze. Turns out I'd completely misspoken and mentioned our other friend." 
 DEFAULT_REF_PATH = os.path.join(SAMPLES_PATH, "dave.wav")
 DEFAULT_GEN_TEXT = "Hello, I'm NeuTTS-Air! How're you doing today?"
