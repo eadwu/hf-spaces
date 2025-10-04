@@ -3,6 +3,7 @@ import os
 import sys
 sys.path.append("neutts-air")
 from neuttsair.neutts import NeuTTSAir
+import numpy as np
 import gradio as gr
 
 SAMPLES_PATH = os.path.join(os.getcwd(), "neutts-air", "samples")
@@ -18,7 +19,11 @@ tts = NeuTTSAir(
 )
 
 @spaces.GPU()
-def infer(ref_text, ref_audio_path, gen_text):
+def infer(
+    ref_text: str,
+    ref_audio_path: str,
+    gen_text: str,
+) -> tuple[int, np.ndarray]:
     """
     Generates speech using NeuTTS-Air given a reference audio and text, and new text to synthesize.
 
