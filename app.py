@@ -19,6 +19,16 @@ tts = NeuTTSAir(
 
 @spaces.GPU()
 def infer(ref_text, ref_audio_path, gen_text):
+    """
+    Generates speech using NeuTTS-Air given a reference audio and text, and new text to synthesize.
+
+    Args:
+        ref_text (str): The text corresponding to the reference audio.
+        ref_audio_path (str): The file path to the reference audio.
+        gen_text (str): The new text to synthesize.
+    Returns:
+        tuple [int, np.ndarray]: A tuple containing the sample rate (24000) and the generated audio waveform as a numpy array.
+    """
 
     gr.Info("Starting inference request!")
     gr.Info("Encoding reference...")
@@ -42,4 +52,4 @@ demo = gr.Interface(
 )
 
 if __name__ == "__main__":
-    demo.launch(allowed_paths=[SAMPLES_PATH], debug=True, inbrowser=True)
+    demo.launch(allowed_paths=[SAMPLES_PATH], mcp_server=True, inbrowser=True)
