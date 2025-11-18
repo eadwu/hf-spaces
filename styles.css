@@ -475,7 +475,9 @@ body.lightning-flash {
 
 .hero-buttons a svg,
 .hero-buttons a img {
-    display: none;
+    display: inline-block;
+    margin-right: 0.5rem;
+    vertical-align: middle;
 }
 
 .business-buttons {
@@ -570,9 +572,6 @@ body.lightning-flash {
     font-weight: 400;
 }
 
-.btn.btn-secondary svg {
-    color: var(--text-secondary);
-}
 
 #presetButtonGroup #presetBookBtn {
     display: none;
