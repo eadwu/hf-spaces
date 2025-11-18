@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Supertonic - Lightning-Fast, On-Device TTS</title>
+        <meta name="description"
+            content="Supertonic - A lightweight, super-fast text-to-speech synthesis system with on-device capabilities. Multi-language support with ONNX Runtime.">
+        <link rel="stylesheet" href="styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet">
+        <link
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+
+        <!-- Import map for ES modules -->
+        <script type="importmap">
+            {
+                "imports": {
+                    "onnxruntime-web": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.23.0/dist/ort.webgpu.min.mjs",
+                    "fft.js": "https://esm.sh/fft.js@4.0.4"
+                }
+            }
+        </script>
+
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-6BZDRPNNES"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-6BZDRPNNES');
+        </script>
+    </head>
+    <body>
+        <header class="header">
+            <img src="img/supertone.svg" alt="Supertone" class="header-logo">
+        </header>
+        <div id="lightning-bg" aria-hidden="true">
+            <svg class="hero-lightning" viewBox="0 0 855.4 868.1" xmlns="http://www.w3.org/2000/svg"
+                role="presentation" focusable="false">
+                <path
+                    d="M581.9 -75.4 h0 c-29.7 71 -63.1 135.1 -107.2 212.4 l83.1 -12.5 c-73.7 130.8 -158.9 265 -254.7 381.2 l83.5 -12.6 C278.2 625.3 133.6 746.6 0.6 855.2 c214.7 -136.9 388.4 -279.3 556.2 -428.3 l-96.5 14.5 c138.8 -123.7 270.7 -264.7 395.1 -402.3 l-127.7 19.2 c41.1 -45.6 80 -90.3 116.9 -133.7 h-262.7 Z" />
+            </svg>
+        </div>
+        <!-- Side Navigation Dots -->
+        <nav class="side-nav">
+            <a href="#hero" class="nav-dot" data-tooltip="Home"></a>
+            <a href="#benchmark" class="nav-dot" data-tooltip="Model comparison"></a>
+            <a href="#demo" class="nav-dot" data-tooltip="Intro Video"></a>
+            <a href="#interactive-demo" class="nav-dot"
+                data-tooltip="Try It"></a>
+            <a href="#text-handling" class="nav-dot" data-tooltip="Text handling"></a>
+            <a href="#features" class="nav-dot" data-tooltip="Features"></a>
+            <a href="#languages" class="nav-dot" data-tooltip="Programming languages"></a>
+            <a href="#research" class="nav-dot" data-tooltip="Research"></a>
+            <a href="#business" class="nav-dot" data-tooltip="Business"></a>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        <span class="hero-title-text">Supertonic</span>
+                        <img src="img/supertonic_wordmark.svg" alt="Supertonic" class="hero-wordmark">
+                    </h1>
+                    <div class="hero-headings">
+                        <p class="hero-subtitle">
+                            <img src="img/supertonic_symbol.svg" alt="" aria-hidden="true" class="hero-subtitle-icon">
+                            <span>Lightning Fast, On-Device TTS.</span>
+                        </p>
+                        <p class="hero-description">
+                            <span>Incredibly lightweight and blazingly fast,</span>
+                            <span>running natively in your environment via ONNX.</span>
+                        </p>
+                    </div>
+                    <div class="hero-buttons">
+                        <a href="https://github.com/supertone-inc/supertonic/"
+                            class="btn btn-secondary" target="_blank">
+                            GitHub <span class="arrow">↗</span>
+                        </a>
+                        <a href="https://huggingface.co/Supertone/Supertonic"
+                            class="btn btn-secondary" target="_blank">
+                            Models <span class="arrow">↗</span>
+                        </a>
+                        <a href="https://supertone.ai/"
+                            class="btn btn-secondary" id="btn-supertone" target="_blank">
+                            Supertone <span class="arrow">↗</span>
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <div class="hero-stat-label">Parameters</div>
+                            <div class="hero-stat-value">66M</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-label">PROGRAMMING LANGUAGES</div>
+                            <div class="hero-stat-value">8+</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-label">On-Device</div>
+                            <div class="hero-stat-value">100%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-bg" aria-hidden="true"></div>
+        </section>
+
+        <!-- Benchmark Section -->
+        <section class="benchmark" id="benchmark">
+            <div class="container">
+                <div class="comparison-container">
+                    <div class="comparison-header">
+                        <div class="comparison-header-wrapper">
+                            <div class="comparison-title-group">
+                                <h2 class="section-title model-comparison">Model comparison</h2>
+                                <h3 class="section-subtitle supertonic-is-faster-than-ever">A new standard in TTS speed</h3>
+                            </div>
+                        </div>
+                        <img src="img/supertonic-cps.png" alt="Supertonic CPS" class="comparison-cps-image" />
+                    </div>
+                    <div class="comparison-content">
+                        <div class="comparison-text">
+                            <h3 class="section-subtitle comparison-subtitle">Characters per second</h3>
+                            <p>Supertonic can process over 12,000 characters on high-end GPUs,<br>and up to about 2,500 characters on consumer laptops.</p>
+                        </div>
+                        <img src="img/supertonic-graph.png" alt="Supertonic Graph" style="max-width: 100%; display: block; margin: 0 auto;" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Demo Video Section -->
+        <section class="demo-video" id="demo">
+            <div class="container">
+                <h2 class="section-title">See It In Action</h2>
+                <h3 class="section-subtitle">Experience the speed and quality</h3>
+
+                <div class="video-container">
+                    <iframe
+                        src="https://www.youtube.com/embed/aN0Y7XaOB2Q?si=-Cmiqd_NokJlpj8C"
+                        title="YouTube video player"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Interactive TTS Demo Section -->
+        <section class="interactive-demo" id="interactive-demo">
+            <div class="container">
+                <h2 class="section-title">Try It Yourself</h2>
+                <h3 class="section-subtitle">Generate speech directly in your browser</h3>
+
+                <div class="demo-container">
+                    <div class="demo-content">
+                        <!-- Title row for the two-column grid -->
+                        <div class="demo-title-row">
+                            <div class="demo-title-left">Text</div>
+                            <div class="demo-title-center">
+                                <img src="img/supertonic_lighteninggraphic.svg" alt="Lightning" class="lightning-icon">
+                            </div>
+                            <div class="demo-title-right">Speech</div>
+                        </div>
+
+                        <div class="demo-input-section">
+                            <div class="demo-input-label">
+                                <label for="demoTextInput">Enter text to
+                                    synthesize:</label>
+                            </div>
+                            <textarea
+                                id="demoTextInput"
+                                placeholder="Type any text here to convert it into speech... (minimum 10 characters)"
+                                rows="3">This text-to-speech system runs entirely in your browser, providing fast and private operation without sending any data to external servers.</textarea>
+                            <div id="presetControlsRow">
+                                <div id="presetButtonGroup">
+                                    <span class="preset-icon" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" focusable="false">
+                                            <rect x="4" y="6" width="14" height="2" fill="#000"/>
+                                            <rect x="4" y="10" width="10" height="2" fill="#000"/>
+                                            <rect x="4" y="14" width="14" height="2" fill="#000"/>
+                                            <rect x="4" y="18" width="10" height="2" fill="#000"/>
+                                        </svg>
+                                    </span>
+                                    <button class="btn btn-secondary text-toggle" data-preset="quote" id="presetQuoteBtn">Quote</button>
+                                    <button class="btn btn-secondary text-toggle" data-preset="paragraph" id="presetParagraphBtn">Paragraph</button>
+                                    <button class="btn btn-secondary text-toggle" data-preset="fullstory" id="presetFullStoryBtn">Full story</button>
+                                    <button class="btn btn-secondary text-toggle" data-preset="book" id="presetBookBtn">Book</button>
+                                    <button class="btn btn-secondary text-toggle" data-preset="freeform" id="freeformBtn">Freeform</button>
+                                </div>
+                                <span class="demo-char-counter" id="demoCharCounter">
+                                    <span id="demoCharCount">126</span> characters
+                                    <span class="demo-char-status" id="demoCharStatus">✓</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="demo-output-section">
+                            <!-- Controls at the top of the right pane -->
+                            <div class="demo-controls">
+                                <div class="demo-param">
+                                    <div class="demo-param-header">
+                                        <label>
+                                            Voice:
+                                        </label>
+                                        <div class="voice-toggle-container">
+                                            <span class="voice-toggle-text active" data-voice="F">Female</span>
+                                            <span class="voice-toggle-text" data-voice="M">Male</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="demo-param">
+                                    <div class="demo-param-header">
+                                        <label for="demoTotalSteps">
+                                            Quality (Steps): <span class="param-value" id="demoTotalStepsValue">5</span>
+                                        </label>
+                                        <span class="param-hint">Higher = Better quality, slower inference</span>
+                                    </div>
+                                    <input type="range" id="demoTotalSteps" value="5" min="2" max="16" step="1">
+                                </div>
+                                <div class="demo-param">
+                                    <div class="demo-param-header">
+                                        <label for="demoDurationFactor">
+                                            Speech Length: <span class="param-value" id="demoDurationFactorValue">1</span>
+                                        </label>
+                                        <span class="param-hint">Higher = Longer speech duration</span>
+                                    </div>
+                                    <input type="range" id="demoDurationFactor" value="1.0" min="0.75" max="1.1" step="0.05">
+                                </div>
+                            </div>
+
+                            <div class="demo-param-header">
+                                <label class="demo-api-keys-label">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                    API Keys
+                                </label>
+                                <span class="param-hint">Optional for performance comparison</span>
+                            </div>
+                            <div class="demo-elevenlabs-config">
+                                <input type="password" id="demoElevenLabsApiKey" placeholder="ElevenLabs Flash v2.5">
+                                <input type="password" id="demoSecondaryApiKey" placeholder="OpenAI TTS-1">
+                                <input type="password" id="demoTertiaryApiKey" placeholder="Gemini 2.5 Flash TTS">
+                            </div>
+
+                                            <button id="demoGenerateBtn" class="demo-generate-btn" disabled>
+                                <img src="img/supertonic_lighteninggraphic.svg" alt="Generate" width="20" height="20" />
+                                <span class="text">Generate Speech</span>
+                                <span class="shimmer" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                        <div id="demoResults" class="demo-results">
+                            <div class="demo-placeholder">
+                                <div class="demo-placeholder-icon">🎙️</div>
+                                <p>Your generated speech will appear here</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Comparison Table -->
+                    <div id="demoComparisonSection" class="demo-comparison-section" style="display: none;">
+                        <h3 class="demo-comparison-title">⚡ Performance Comparison</h3>
+                        <div class="demo-comparison-table">
+                            <div class="demo-comparison-header">
+                                <div class="demo-comparison-cell">System</div>
+                                <div class="demo-comparison-cell">Status</div>
+                                <div class="demo-comparison-cell">Processing Time</div>
+                                <div class="demo-comparison-cell">Audio Duration</div>
+                                <div class="demo-comparison-cell">RTF (Real-Time Factor)</div>
+                            </div>
+                            <div class="demo-comparison-row supertonic-row">
+                                <div class="demo-comparison-cell">
+                                    <strong>Supertonic</strong>
+                                    <span class="system-badge supertonic">On-Device</span>
+                                </div>
+                                <div class="demo-comparison-cell" id="supertonicStatus">⏳ Running...</div>
+                                <div class="demo-comparison-cell" id="supertonicTime">-</div>
+                                <div class="demo-comparison-cell" id="supertonicDuration">-</div>
+                                <div class="demo-comparison-cell" id="supertonicRTF">-</div>
+                            </div>
+                            <div class="demo-comparison-row elevenlabs-row">
+                                <div class="demo-comparison-cell">
+                                    <strong>ElevenLabs Flash v2.5</strong>
+                                    <span class="system-badge elevenlabs">Cloud API</span>
+                                </div>
+                                <div class="demo-comparison-cell" id="elevenlabsStatus">⏳ Running...</div>
+                                <div class="demo-comparison-cell" id="elevenlabsTime">-</div>
+                                <div class="demo-comparison-cell" id="elevenlabsDuration">-</div>
+                                <div class="demo-comparison-cell" id="elevenlabsRTF">-</div>
+                            </div>
+                            <div class="demo-comparison-row openai-row">
+                                <div class="demo-comparison-cell">
+                                    <strong>OpenAI TTS-1</strong>
+                                    <span class="system-badge openai">Cloud API</span>
+                                </div>
+                                <div class="demo-comparison-cell" id="openaiStatus">⏳ Running...</div>
+                                <div class="demo-comparison-cell" id="openaiTime">-</div>
+                                <div class="demo-comparison-cell" id="openaiDuration">-</div>
+                                <div class="demo-comparison-cell" id="openaiRTF">-</div>
+                            </div>
+                            <div class="demo-comparison-row gemini-row">
+                                <div class="demo-comparison-cell">
+                                    <strong>Gemini 2.5 Flash TTS</strong>
+                                    <span class="system-badge gemini">Cloud API</span>
+                                </div>
+                                <div class="demo-comparison-cell" id="geminiStatus">⏳ Running...</div>
+                                <div class="demo-comparison-cell" id="geminiTime">-</div>
+                                <div class="demo-comparison-cell" id="geminiDuration">-</div>
+                                <div class="demo-comparison-cell" id="geminiRTF">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Moved below content: status box and info banner -->
+                    <div class="demo-status-box" id="demoStatusBox">
+                        <div class="demo-status-content">
+                            <div class="demo-status-text" id="demoStatusText">
+                                <strong>Initializing...</strong> Loading models...
+                            </div>
+                        </div>
+                        <div class="demo-backend-badge" id="demoBackendBadge">Loading</div>
+                    </div>
+
+                    <div id="demoError" class="demo-error"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Natural Text Handling Section -->
+        <section class="text-handling" id="text-handling">
+            <div class="container">
+                <h2 class="section-title">Text handling</h2>
+                <h3 class="section-subtitle">Handles text like humans</h3>
+
+                <div class="features-grid text-handling-grid">
+                    <article class="feature-card text-handling-card" data-card="financial">
+                        <div class="text-handling-card-body">
+                            <div class="text-handling-top">
+                                <div>
+                                    <h3 class="text-handling-label">Financial Expressions</h3>
+                                    <p class="text-handling-desc">Currency symbols, codes, and abbreviations (M, K, $)</p>
+                                </div>
+                                <button class="text-handling-player" type="button" aria-pressed="false" aria-label="Play Financial Expressions sample"></button>
+                            </div>
+                            <div class="text-handling-buttons" role="group" aria-label="System selection">
+                                <button type="button" class="provider-option" data-provider="Supertone" aria-pressed="false">
+                                    <img src="img/icon-provider-supertonic.svg" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>Supertone</span>
+                                </button>
+                                <button type="button" class="provider-option" data-provider="ElevenLabs" aria-pressed="false">
+                                    <img src="img/icon-provider-elevenlabs.svg" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>ElevenLabs</span>
+                                </button>
+                                <button type="button" class="provider-option" data-provider="OpenAI" aria-pressed="false">
+                                    <img src="img/icon-provider-openai.svg" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>OpenAI</span>
+                                </button>
+                                <button type="button" class="provider-option" data-provider="Gemini" aria-pressed="false">
+                                    <img src="img/icon-provider-gemini.png" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>Gemini</span>
+                                </button>
+                            </div>
+                            <p class="text-handling-sample">
+                                The startup secured <span class="text-highlight">$5.2M</span> in venture capital,<br>
+                                a huge leap from their initial <span class="text-highlight">$450K</span> seed round.
+                            </p>
+                            <div class="text-handling-footer">
+                                <div class="text-model">
+                                    <img src="img/icon-provideo-model.svg" alt="" aria-hidden="true" class="text-model-icon">
+                                    <span class="text-model-label">Supertonic</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="feature-card text-handling-card" data-card="time-date">
+                        <div class="text-handling-card-body">
+                            <div class="text-handling-top">
+                                <div>
+                                    <h3 class="text-handling-label">Time and Date</h3>
+                                    <p class="text-handling-desc">Time and date formats, abbreviated weekdays/months</p>
+                                </div>
+                                <button class="text-handling-player" type="button" aria-pressed="false" aria-label="Play Time and Date sample"></button>
+                            </div>
+                            <div class="text-handling-buttons" role="group" aria-label="System selection">
+                                <button type="button" class="provider-option" data-provider="Supertone" aria-pressed="false">
+                                    <img src="img/icon-provider-supertonic.svg" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>Supertone</span>
+                                </button>
+                                <button type="button" class="provider-option" data-provider="ElevenLabs" aria-pressed="false">
+                                    <img src="img/icon-provider-elevenlabs.svg" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>ElevenLabs</span>
+                                </button>
+                                <button type="button" class="provider-option" data-provider="OpenAI" aria-pressed="false">
+                                    <img src="img/icon-provider-openai.svg" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>OpenAI</span>
+                                </button>
+                                <button type="button" class="provider-option" data-provider="Gemini" aria-pressed="false">
+                                    <img src="img/icon-provider-gemini.png" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>Gemini</span>
+                                </button>
+                            </div>
+                            <p class="text-handling-sample">
+                                The train delay was announced at <span class="text-highlight">4:45 PM</span> on
+                                <span class="text-highlight">Wed, Apr 3, 2024</span> due to track maintenance.
+                            </p>
+                            <div class="text-handling-footer">
+                                <div class="text-model">
+                                    <img src="img/icon-provideo-model.svg" alt="" aria-hidden="true" class="text-model-icon">
+                                    <span class="text-model-label">Supertonic</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="feature-card text-handling-card" data-card="phone-number">
+                        <div class="text-handling-card-body">
+                            <div class="text-handling-top">
+                                <div>
+                                    <h3 class="text-handling-label">Phone Numbers</h3>
+                                    <p class="text-handling-desc">Area codes, hyphens, extensions (ext.)</p>
+                                </div>
+                                <button class="text-handling-player" type="button" aria-pressed="false" aria-label="Play Phone Numbers sample"></button>
+                            </div>
+                            <div class="text-handling-buttons" role="group" aria-label="System selection">
+                                <button type="button" class="provider-option" data-provider="Supertone" aria-pressed="false">
+                                    <img src="img/icon-provider-supertonic.svg" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>Supertone</span>
+                                </button>
+                                <button type="button" class="provider-option" data-provider="ElevenLabs" aria-pressed="false">
+                                    <img src="img/icon-provider-elevenlabs.svg" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>ElevenLabs</span>
+                                </button>
+                                <button type="button" class="provider-option" data-provider="OpenAI" aria-pressed="false">
+                                    <img src="img/icon-provider-openai.svg" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>OpenAI</span>
+                                </button>
+                                <button type="button" class="provider-option" data-provider="Gemini" aria-pressed="false">
+                                    <img src="img/icon-provider-gemini.png" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>Gemini</span>
+                                </button>
+                            </div>
+                            <p class="text-handling-sample">
+                                You can reach the hotel front desk at <span class="text-highlight">(212) 555-0142 ext. 402</span> anytime.
+                            </p>
+                            <div class="text-handling-footer">
+                                <div class="text-model">
+                                    <img src="img/icon-provideo-model.svg" alt="" aria-hidden="true" class="text-model-icon">
+                                    <span class="text-model-label">Supertonic</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="feature-card text-handling-card" data-card="technical-unit">
+                        <div class="text-handling-card-body">
+                            <div class="text-handling-top">
+                                <div>
+                                    <h3 class="text-handling-label">Technical Units</h3>
+                                    <p class="text-handling-desc">Numbers with units, abbreviated technical notations</p>
+                                </div>
+                                <button class="text-handling-player" type="button" aria-pressed="false" aria-label="Play Technical Units sample"></button>
+                            </div>
+                            <div class="text-handling-buttons" role="group" aria-label="System selection">
+                                <button type="button" class="provider-option" data-provider="Supertone" aria-pressed="false">
+                                    <img src="img/icon-provider-supertonic.svg" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>Supertone</span>
+                                </button>
+                                <button type="button" class="provider-option" data-provider="ElevenLabs" aria-pressed="false">
+                                    <img src="img/icon-provider-elevenlabs.svg" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>ElevenLabs</span>
+                                </button>
+                                <button type="button" class="provider-option" data-provider="OpenAI" aria-pressed="false">
+                                    <img src="img/icon-provider-openai.svg" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>OpenAI</span>
+                                </button>
+                                <button type="button" class="provider-option" data-provider="Gemini" aria-pressed="false">
+                                    <img src="img/icon-provider-gemini.png" alt="" aria-hidden="true" class="provider-option-icon">
+                                    <span>Gemini</span>
+                                </button>
+                            </div>
+                            <p class="text-handling-sample">
+                                Our drone battery lasts <span class="text-highlight">2.3h</span> when flying at
+                                <span class="text-highlight">30kph</span> with full camera payload.
+                            </p>
+                            <div class="text-handling-footer">
+                                <div class="text-model">
+                                    <img src="img/icon-provideo-model.svg" alt="" aria-hidden="true" class="text-model-icon">
+                                    <span class="text-model-label">Supertonic</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <div class="container">
+                <h2 class="section-title">Why Supertonic?</h2>
+                <h3 class="section-subtitle">Performance by design</h3>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <img src="img/spec0.svg" alt="">
+                        </div>
+                        <h3>Blazingly Fast</h3>
+                        <p>Optimized ONNX Runtime inference delivers speech
+                            synthesis at unprecedented speeds. No more
+                            waiting.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <img src="img/spec1.svg" alt="">
+                        </div>
+                        <h3>Ultra Lightweight</h3>
+                        <p>Minimal footprint means it runs smoothly on any
+                            device - from servers to embedded systems.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <img src="img/spec2.svg" alt="">
+                        </div>
+                        <h3>On-Device Capable</h3>
+                        <p>Complete privacy and zero latency. All
+                            processing
+                            happens locally - no cloud dependencies.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <img src="img/spec3.svg" alt="">
+                        </div>
+                        <h3>Natural Text Handling</h3>
+                        <p>Seamlessly processes numbers, dates, currency, abbreviations, and complex expressions without pre-processing.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <img src="img/spec4.svg" alt="">
+                        </div>
+                        <h3>Highly Configurable</h3>
+                        <p>Adjust inference steps, batch processing, and
+                            other parameters to match your specific needs.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <img src="img/spec5.svg" alt="">
+                        </div>
+                        <h3>Flexible Deployment</h3>
+                        <p>Deploy seamlessly across servers, browsers, and edge
+                            devices with multiple runtime backends.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Language Support Section -->
+        <section class="languages" id="languages">
+            <div class="container">
+                <div class="languages-layout">
+                    <div class="languages-text-section">
+                        <div class="languages-header">
+                            <h2 class="section-title">Programming Languages</h2>
+                            <h3 class="languages-subtitle">Fast setup,<br>instant execution.<br><br>Experience Supertonic in your favorite language.</h3>
+                        </div>
+                    </div>
+                    <div class="languages-placeholder">
+                        <div class="languages-code-card">
+                            <div class="languages-tablist" role="tablist"
+                                aria-label="Programming language code snippets">
+                                <button class="language-option active" type="button"
+                                    data-language="python" role="tab" aria-selected="true"
+                                    tabindex="0">
+                                    <img class="component-2" src="img/lang_1.svg"
+                                        alt="Python logo">
+                                    <span class="language-label">Python</span>
+                                </button>
+                                <button class="language-option" type="button"
+                                    data-language="javascript" role="tab" aria-selected="false"
+                                    tabindex="-1">
+                                    <img class="component-2" src="img/lang_2.svg"
+                                        alt="" aria-hidden="true">
+                                    <span class="language-label">JavaScript</span>
+                                </button>
+                                <button class="language-option" type="button"
+                                    data-language="java" role="tab" aria-selected="false"
+                                    tabindex="-1">
+                                    <img class="component-2" src="img/lang_3.svg"
+                                        alt="" aria-hidden="true">
+                                    <span class="language-label">Java</span>
+                                </button>
+                                <button class="language-option" type="button"
+                                    data-language="cpp" role="tab" aria-selected="false"
+                                    tabindex="-1">
+                                    <img class="component-2" src="img/lang_4.svg"
+                                        alt="" aria-hidden="true">
+                                    <span class="language-label">C++</span>
+                                </button>
+                                <button class="language-option" type="button"
+                                    data-language="csharp" role="tab" aria-selected="false"
+                                    tabindex="-1">
+                                    <img class="component-2" src="img/lang_8.svg"
+                                        alt="" aria-hidden="true">
+                                    <span class="language-label">C#</span>
+                                </button>
+                                <button class="language-option" type="button"
+                                    data-language="go" role="tab" aria-selected="false"
+                                    tabindex="-1">
+                                    <img class="component-2" src="img/lang_5.svg"
+                                        alt="" aria-hidden="true">
+                                    <span class="language-label">Go</span>
+                                </button>
+                                <button class="language-option" type="button"
+                                    data-language="swift" role="tab" aria-selected="false"
+                                    tabindex="-1">
+                                    <img class="component-2" src="img/lang_6.svg"
+                                        alt="" aria-hidden="true">
+                                    <span class="language-label">Swift</span>
+                                </button>
+                                <button class="language-option" type="button"
+                                    data-language="rust" role="tab" aria-selected="false"
+                                    tabindex="-1">
+                                    <img class="component-2" src="img/lang_7.svg"
+                                        alt="" aria-hidden="true">
+                                    <span class="language-label">Rust</span>
+                                </button>
+                            </div>
+                            <div class="languages-code-body">
+                                <pre class="code-snippet" data-language-snippet aria-live="polite"></pre>
+                                <button type="button" class="code-copy-btn" aria-label="Copy code snippet">
+                                    <img src="img/btn_cv.svg" alt="">
+                                </button>
+                                <div class="code-copy-toast" role="status" aria-live="polite"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="languages-icons-container">
+                        <div class="languages-icons-grid">
+                            <button type="button" class="language-icon component-22 active"
+                                data-language="python" aria-label="Python" aria-pressed="true">
+                                <img class="lang_btn" src="img/lang_1.svg" alt="">
+                            </button>
+                            <button type="button" class="language-icon component-3"
+                                data-language="javascript" aria-label="JavaScript"
+                                aria-pressed="false">
+                                <img class="lang_btn" src="img/lang_2.svg" alt="" aria-hidden="true">
+                            </button>
+                            <button type="button" class="language-icon component-4"
+                                data-language="java" aria-label="Java" aria-pressed="false">
+                                <img class="lang_btn" src="img/lang_3.svg" alt="" aria-hidden="true">
+                            </button>
+                            <button type="button" class="language-icon component-5"
+                                data-language="cpp" aria-label="C++" aria-pressed="false">
+                                <img class="lang_btn" src="img/lang_4.svg" alt="">
+                            </button>
+                            <button type="button" class="language-icon component-6"
+                                data-language="csharp" aria-label="C#" aria-pressed="false">
+                                <img class="text-model" src="img/lang_8.svg" alt="">
+                            </button>
+                            <button type="button" class="language-icon component-7"
+                                data-language="go" aria-label="Go" aria-pressed="false">
+                                <img class="lang_btn" src="img/lang_5.svg" alt="">
+                            </button>
+                            <button type="button" class="language-icon component-8"
+                                data-language="swift" aria-label="Swift" aria-pressed="false">
+                                <img class="lang_btn" src="img/lang_6.svg" alt="">
+                            </button>
+                            <button type="button" class="language-icon component-9"
+                                data-language="rust" aria-label="Rust" aria-pressed="false">
+                                <img class="lang_btn" src="img/lang_7.svg" alt="">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Research Papers Section -->
+        <section class="research-papers" id="research">
+            <div class="container">
+                <h2 class="section-title">Research & Innovation</h2>
+                <h3 class="section-subtitle">Built on our cutting-edge research</h3>
+
+                <div class="papers-grid">
+                    <a class="paper-card" href="https://arxiv.org/abs/2503.23108"
+                        target="_blank" rel="noopener">
+                        <h3>SupertonicTTS: Towards Highly Efficient and
+                            Streamlined Text-to-Speech System</h3>
+                        <p class="paper-authors">Hyeongju Kim, Jinhyeok Yang,
+                            Yechan Yu, Seunghun Ji, Jacob Morton, Frederik Bous,
+                            Joon Byun, Juheon Lee</p>
+                        <p class="paper-description">
+                            Presents <span class="paper-highlight">SupertonicTTS</span>, a highly
+                            efficient TTS framework built on flow-matching and
+                            ConvNeXt blocks. Features context-sharing batch
+                            expansion,
+                            character-level processing, and cross-attention
+                            alignment without the need for external G2P
+                            modules or aligners.
+                        </p>
+                        <span class="paper-link">
+                            <span class="link-text">Read Paper</span><span class="arrow">↗</span>
+                        </span>
+                    </a>
+
+                    <a class="paper-card" href="https://arxiv.org/abs/2509.11084"
+                        target="_blank" rel="noopener">
+                        <h3>Length-Aware Rotary Position Embedding for
+                            Text-Speech Alignment</h3>
+                        <p class="paper-authors">Hyeongju Kim, Juheon Lee,
+                            Jinhyeok Yang, Jacob Morton</p>
+                        <p class="paper-description">
+                            Introduces <span class="paper-highlight">LARoPE</span>, an improved
+                            position embedding method that enables faster
+                            convergence,
+                            more accurate alignment, and better stability in
+                            extended speech generation up to 30 seconds.
+                            Achieves state-of-the-art word error rate on
+                            zero-shot TTS benchmarks.
+                        </p>
+                        <span class="paper-link">
+                            <span class="link-text">Read Paper</span><span class="arrow">↗</span>
+                        </span>
+                    </a>
+
+                    <a class="paper-card" href="https://arxiv.org/abs/2509.19091"
+                        target="_blank" rel="noopener">
+                        <h3>Training Flow Matching Models with Reliable Labels
+                            via Self-Purification</h3>
+                        <p class="paper-authors">Hyeongju Kim, Yechan Yu, June
+                            Young Yi, Juheon Lee</p>
+                        <p class="paper-description">
+                            Proposes <span class="paper-highlight">Self-Purifying Flow Matching
+                                (SPFM)</span>, a principled approach to handle
+                            noisy training data.
+                            Identifies unreliable samples during training
+                            without pretrained models, ensuring accurate
+                            conditioning
+                            even with label contamination.
+                        </p>
+                        <span class="paper-link">
+                            <span class="link-text">Read Paper</span><span class="arrow">↗</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Business Inquiry Section -->
+        <section class="business-inquiry" id="business">
+            <div class="container">
+                <div class="business-content">
+                    <div class="business-text">
+                        <h2>
+                            <span style="display:block;">On-Device SDK Solutions</span>
+                            <span style="display:block;">for Your Business</span>
+                        </h2>
+                        <h6 class="business-subheadline">
+                            Looking to integrate Supertonic into your product?<br>
+                            We offer customized on-device SDK solutions tailored to your business needs. Our lightweight, high-performance TTS technology can be seamlessly integrated into mobile apps, IoT devices, automotive systems, and more.
+                        </h6>
+                        <div class="business-buttons">
+                            <a href="mailto:contact@supertone.ai"
+                                class="btn btn-secondary" id="btn-contact" target="_blank">
+                                <span class="btn-label">Contact</span>
+                                <span class="arrow">↗</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <img src="img/logo.svg" alt="Supertonic logo" class="footer-logo">
+                    <div class="footer-text">
+                        <p>
+                            Developed by <a href="https://www.supertone.ai/"
+                                target="_blank" rel="noopener">Supertone</a> ·
+                            &copy; 2025 Supertone Inc.
+                        </p>
+                        <div class="footer-links">
+                            <a href="https://github.com/supertone-inc/supertonic/"
+                                target="_blank">GitHub</a>
+                            <a href="https://huggingface.co/Supertone/Supertonic"
+                                target="_blank">Models</a>
+                            <a href="https://www.supertone.ai/"
+                                target="_blank" rel="noopener">Supertone</a>
+                            <a href="mailto:contact@supertone.ai" target="_blank">Contact</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <svg class="lightning-filters" width="0" height="0" aria-hidden="true" focusable="false">
+            <filter id="lightning-flicker-filter">
+                <feColorMatrix type="matrix"
+                    values="0 0 0 0 1
+                            0 0 0 0 1
+                            0 0 0 0 1
+                            0 0 0 1 0"></feColorMatrix>
+            </filter>
+            <filter id="lightning-flash-filter">
+                <feColorMatrix type="matrix"
+                    values="0 0 0 0 1
+                            0 0 0 0 1
+                            0 0 0 0 1
+                            0 0 0 1 0"></feColorMatrix>
+            </filter>
+        </svg>
+
+        <!-- Billing Confirmation Modal -->
+        <div id="billingModal" class="billing-modal">
+            <div class="billing-modal-overlay"></div>
+            <div class="billing-modal-content">
+                <div class="billing-modal-header">
+                    <svg class="billing-modal-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L1 21h22L12 2z" fill="currentColor"/>
+                        <path d="M12 9.5v5M12 17.5h.01" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="12" cy="17.5" r="1" fill="#fff"/>
+                    </svg>
+                    <h3 class="billing-modal-title">Confirm API Usage</h3>
+                </div>
+                <div class="billing-modal-body">
+                    <p class="billing-modal-message" id="billingModalMessage"></p>
+                    <div class="billing-modal-details">
+                        <div class="billing-detail-item">
+                            <span class="billing-detail-label">Characters:</span>
+                            <span class="billing-detail-value" id="billingCharCount">0</span>
+                        </div>
+                        <div class="billing-detail-item">
+                            <span class="billing-detail-label">TTS Model:</span>
+                            <span class="billing-detail-value" id="billingProviders"></span>
+                        </div>
+                    </div>
+                    <p class="billing-modal-warning">⚠️ You will be charged by each API provider according to their respective pricing policies.</p>
+                </div>
+                <div class="billing-modal-footer">
+                    <button class="billing-modal-btn billing-modal-btn-cancel" id="billingModalCancel">Cancel</button>
+                    <button class="billing-modal-btn billing-modal-btn-confirm" id="billingModalConfirm">Proceed</button>
+                </div>
+            </div>
+        </div>
+
+        <script src="preset-texts.js"></script>
+        <script type="module" src="script.js"></script>
+  
+    </body>
+</html>
