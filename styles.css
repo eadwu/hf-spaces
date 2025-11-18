@@ -311,7 +311,7 @@ body.lightning-flash {
   align-items: center;
   width: 100%;
   max-width: 1200px;
-  margin: 4rem auto 6rem;
+  margin: 4rem auto 4rem;
 }
 .hero-bg {
     position: absolute;
@@ -469,7 +469,7 @@ body.lightning-flash {
     gap: 1.5rem;
     justify-content: center;
     flex-wrap: wrap;
-    margin-bottom: 4rem;
+    margin-bottom: 6rem;
     animation: fadeInUp 0.6s ease-out 0.5s both;
 }
 
@@ -513,7 +513,7 @@ body.lightning-flash {
 }
 
 .btn-secondary {
-    background: rgba(242, 242, 242, 0.7);
+    background: rgba(242, 242, 242, 0);
     color: var(--text);
     width: 11rem;
     display: flex;
@@ -2643,7 +2643,7 @@ section {
 /* Business Inquiry Section */
 .business-inquiry {
     background: var(--light);
-    padding: 3rem 0 10rem;
+    padding: 3rem 0 4rem;
 }
 
 .business-content {
