@@ -6,12 +6,12 @@ colorTo: gray
 sdk: static
 header: mini
 pinned: false
+short_description: Lightning-Fast, On-Device TTS
 tags:
   - speech-synthesis
   - text-to-speech
   - audio
   - voice
-short_description: Lightning-Fast, On-Device TTS
 
 # custom_headers:
 #   cross-origin-embedder-policy: require-corp
