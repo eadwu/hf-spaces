@@ -2394,6 +2394,19 @@ section {
     .languages-tablist .language-option.active .component-2 {
         display: none;
     }
+
+    .language-option[data-language="javascript"] .language-label {
+        font-size: 0;
+        line-height: 0;
+    }
+
+    .language-option[data-language="javascript"] .language-label::after {
+        content: "JS";
+        font-size: 0.875rem;
+        line-height: 1;
+        display: inline-block;
+        vertical-align: baseline;
+    }
 }
 
 .language-option:focus-visible {
