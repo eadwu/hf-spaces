@@ -910,7 +910,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Track all custom audio players (for ElevenLabs, etc.)
     let customAudioPlayers = [];
     const textHandlingAudioPlayers = [];
-    const TEXT_HANDLING_CARD_AUDIO_MAP = [1, 3, 2, 4];
+    const TEXT_HANDLING_CARD_AUDIO_MAP = [1, 2, 3, 4];
     let isComparisonMode = false;
 
     const isMobileViewport = () => window.matchMedia('(max-width: 768px)').matches;
