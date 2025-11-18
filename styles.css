@@ -2823,6 +2823,16 @@ section {
         align-items: flex-start;
     }
 
+    .feature-card.text-handling-card {
+        display: flex;
+        flex-direction: column;
+        grid-template-columns: none;
+    }
+
+    .text-handling-card-body {
+        width: 100%;
+    }
+
     .feature-card .feature-icon {
         grid-column: 1;
         grid-row: 1;
