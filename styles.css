@@ -542,6 +542,9 @@ body.lightning-flash {
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
+    width: auto;
+    justify-content: initial;
+    align-items: initial;
 }
 
 .preset-icon {
