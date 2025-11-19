@@ -2040,6 +2040,12 @@ section {
     font-size: 1.5rem;
 }
 
+.text-handling-desc {
+    font-size: 0.8rem;
+    line-height: 1.2rem;
+    font-family: var(--font-body);
+}
+
 .text-handling-buttons {
     display: flex;
     flex-wrap: wrap;
@@ -2268,10 +2274,11 @@ section {
     font-weight: 300;
 }
 
-.feature-card p {
-    line-height: 1.2rem;
-    font-size: 0.8rem;
+.feature-card > p {
+    line-height: 150%;
+    font-size: 1rem;
     font-family: var(--font-body);
+    letter-spacing: -0.02em;
 }
 
 /* Languages Section */
@@ -2395,17 +2402,8 @@ section {
         display: none;
     }
 
-    .language-option[data-language="javascript"] .language-label {
-        font-size: 0;
-        line-height: 0;
-    }
-
     .language-option[data-language="javascript"] .language-label::after {
         content: "JS";
-        font-size: 0.875rem;
-        line-height: 1;
-        display: inline-block;
-        vertical-align: baseline;
     }
 }
 
@@ -2861,7 +2859,7 @@ section {
     }
 
     .feature-card h3,
-    .feature-card p {
+    .feature-card > p {
         grid-column: 2;
     }
 
