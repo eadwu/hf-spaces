@@ -8,13 +8,9 @@ header: mini
 pinned: false
 short_description: Lightning-Fast, On-Device TTS
 tags:
-  - speech-synthesis
-  - text-to-speech
-  - audio
-  - voice
-
-# custom_headers:
-#   cross-origin-embedder-policy: require-corp
-#   cross-origin-opener-policy: same-origin
-#   cross-origin-resource-policy: cross-origin
+- speech-synthesis
+- text-to-speech
+- audio
+- voice
+license: openrail
 ---
