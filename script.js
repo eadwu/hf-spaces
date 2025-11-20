@@ -2558,6 +2558,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const geminiApiKey = demoTertiaryApiKey.value.trim();
         const hasComparison = !!elevenlabsApiKey || !!openaiApiKey || !!geminiApiKey;
         isComparisonMode = hasComparison;
+        document.body.classList.toggle('comparison-mode', hasComparison);
 
         currentGenerationTextLength = text.length;
         
