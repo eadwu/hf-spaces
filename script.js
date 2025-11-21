@@ -1292,6 +1292,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check WebGPU support more thoroughly
     async function checkWebGPUSupport() {
         try {
+            // Detect iOS/Safari
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
+            // iOS and Safari have incomplete WebGPU support
+            if (isIOS) {
+                return { supported: false, reason: 'iOS does not support the required WebGPU features' };
+            }
+            
             // Check if WebGPU is available in the browser
             if (!navigator.gpu) {
                 return { supported: false, reason: 'WebGPU not available in this browser' };
@@ -1318,6 +1327,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             return { supported: true, adapter, device };
         } catch (error) {
+            // Handle specific iOS/Safari errors
+            const errorMsg = error.message || '';
+            if (errorMsg.includes('subgroupMinSize') || errorMsg.includes('subgroup')) {
+                return { supported: false, reason: 'iOS/Safari does not support required WebGPU features (subgroup operations)' };
+            }
             return { supported: false, reason: error.message };
         }
     }
@@ -1431,7 +1445,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // If WebGPU is not supported, show message and disable demo
             if (!webgpuCheck.supported) {
-                showDemoStatus(`Please use a browser that supports WebGPU (Chrome 113+, Edge 113+, or other WebGPU-enabled browsers).`, 'error', 100);
+                // Show specific message for iOS users
+                const errorMessage = webgpuCheck.reason.includes('iOS')
+                    ? `<strong>iOS is not currently supported.</strong><br>Please use a desktop browser that supports WebGPU (Chrome 113+, Edge 113+).`
+                    : `Please use a browser that supports WebGPU (Chrome 113+, Edge 113+, or other WebGPU-enabled browsers).`;
+                
+                showDemoStatus(errorMessage, 'error', 100);
                 showBackendBadge('Not Supported');
                 
                 // Disable all input elements
