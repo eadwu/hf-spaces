@@ -1295,10 +1295,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Detect iOS/Safari
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isSafari = /^((?!chrome|crios|android|edg|firefox).)*safari/i.test(navigator.userAgent);
             
             // iOS and Safari have incomplete WebGPU support
             if (isIOS) {
                 return { supported: false, reason: 'iOS does not support the required WebGPU features' };
+            }
+            if (isSafari) {
+                // Desktop Safari might work, but check carefully
+               return { supported: false, reason: 'Safari does not support the required WebGPU features' };
             }
             
             // Check if WebGPU is available in the browser
@@ -1446,8 +1451,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // If WebGPU is not supported, show message and disable demo
             if (!webgpuCheck.supported) {
                 // Show specific message for iOS users
-                const errorMessage = webgpuCheck.reason.includes('iOS')
-                    ? `<strong>iOS is not currently supported.</strong><br>Please use a desktop browser that supports WebGPU (Chrome 113+, Edge 113+).`
+                const errorMessage = webgpuCheck.reason.includes('iOS') || webgpuCheck.reason.includes('Safari')
+                    ? `<strong>iOS/Safari is not currently supported.</strong><br>Please use a desktop browser that supports WebGPU (Chrome 113+, Edge 113+).`
                     : `Please use a browser that supports WebGPU (Chrome 113+, Edge 113+, or other WebGPU-enabled browsers).`;
                 
                 showDemoStatus(errorMessage, 'error', 100);
