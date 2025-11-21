@@ -326,6 +326,12 @@ export async function loadOnnxAll(basePath, opts, onProgress) {
         result[key] = session;
     });
 
+    try {
+        // Download counting
+        await fetch('https://huggingface.co/Supertone/supertonic/resolve/main/config.json');
+    } catch (error) {
+        console.warn('Failed to update download count:', error);
+    }
     return result;
 }
 
