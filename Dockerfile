@@ -10,7 +10,7 @@ RUN mkdir /workspace && cd /workspace && \
   uv venv --seed --python 3.12 && \
   uv pip --no-cache install --no-cache-dir -U comfy-cli && \
   echo "N" | uv run comfy tracking disable && \
-  echo "y" | uv run comfy install --version v0.3.70 --restore --nvidia --cuda-version 12.9 && \
+  echo "y" | uv run comfy install --version v0.3.72 --restore --nvidia --cuda-version 12.9 && \
   uv pip --no-cache install --no-cache-dir -U torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu130 && \
   rm -rf ~/.cache/pip && \
   sed -i 's@ and comfy.model_management.WINDOWS@@' /root/comfy/ComfyUI/comfy/ops.py
