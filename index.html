@@ -137,20 +137,52 @@
         </section>
 
         <!-- Demo Video Section -->
-        <section class="demo-video" id="demo">
+        <section class="intro-video" id="demo">
             <div class="container">
                 <h2 class="section-title">See It In Action</h2>
                 <h3 class="section-subtitle">Experience the speed and quality</h3>
 
                 <div class="video-container">
                     <iframe
-                        src="https://www.youtube.com/embed/aN0Y7XaOB2Q?si=-Cmiqd_NokJlpj8C"
+                        src="https://www.youtube.com/embed/USdrptxgSnI"
                         title="YouTube video player"
                         frameborder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         referrerpolicy="strict-origin-when-cross-origin"
                         allowfullscreen>
                     </iframe>
+                </div>
+
+                <div class="demo-videos-grid">
+                    <div class="demo-video-item">
+                        <div class="video-container">
+                            <iframe
+                                src="https://www.youtube.com/embed/EbHrtSmfoiE"
+                                title="YouTube video player"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        <h3>Raspberry Pi</h3>
+                        <p>Watch Supertonic running on a Raspberry Pi, demonstrating on-device, real-time text-to-speech synthesis</p>
+                    </div>
+
+                    <div class="demo-video-item">
+                        <div class="video-container">
+                            <iframe
+                                src="https://www.youtube.com/embed/tP_ceNiPc7g"
+                                title="YouTube video player"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        <h3>E-Reader</h3>
+                        <p>Experience Supertonic on an Onyx Boox Go 6 e-reader in airplane mode, achieving an average RTF of 0.3× with zero network dependency</p>
+                    </div>
                 </div>
 
             </div>
@@ -334,6 +366,20 @@
                     </div>
 
                     <div id="demoError" class="demo-error"></div>
+                </div>
+
+                <div class="transformers-container">
+                    <img src="img/hugging_supertonic.svg" alt="Hugging Face Supertonic" class="transformers-logo">
+                    <p>
+                        Supertonic is now fully supported in <a href="https://huggingface.co/docs/transformers.js/en/index" target="_blank" rel="noopener noreferrer">Transformers.js</a> 🤗!<br>
+                        It uses a quantized ONNX version of Supertonic for faster inference.
+                    </p>
+                    <div class="transformers-buttons">
+                        <a href="https://huggingface.co/spaces/webml-community/Supertonic-TTS-WebGPU" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+                            <span class="btn-label">Try it out</span>
+                            <span class="arrow">↗</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
