@@ -1,7 +1,7 @@
 // Preset text content for demo buttons
 window.presetTexts = {
     quote: "This text-to-speech system runs entirely in your browser, providing fast and private operation without sending any data to external servers.",
-    paragraph: "Supertone is involved in all processes that utilize voice in business. Maybe you want to create a new voice for your brand, or maybe you need a clean, quality voice source. To quickly adapt a voice to suit your business, you may be able to create a voice with simple text input, or you may need to convert a celebrity's voice into various languages for a global content business. Supertone provides solutions in an appropriate form to suit business needs, including applications, APIs, and SDKs.",
+    paragraph: "Supertone is involved in all processes that utilize voice in business. Maybe you want to create a new voice for your brand, or maybe you need a clean, quality voice source. To quickly adapt a voice to suit your business, you may be able to create a voice with simple text input, or you may need to convert a celebrity's voice into various languages for a global content business. Supertone provides solutions in an appropriate form to suit business needs, through applications and APIs.",
     fullstory_: `THE TELL-TALE HEART
 by Edgar Allan Poe
 
