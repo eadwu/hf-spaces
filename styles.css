@@ -742,7 +742,7 @@ section {
 .comparison-text p {
     text-align: center;
     line-height: 1.2rem;
-    font-size: 0.8rem;
+    font-size: 16px;
     font-family: var(--font-body);
 }
 
@@ -2192,6 +2192,11 @@ body.comparison-mode .demo-result-item {
 .provider-option[data-provider="Gemini"] .provider-option-icon {
     width: 100%;
     height: 100%;
+}
+
+.provider-option[data-provider="Microsoft"] .provider-option-icon {
+    width: 72.25%;
+    height: 72.25%;
 }
 
 .text-handling-player {

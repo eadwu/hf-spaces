@@ -3712,6 +3712,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return 'openai';
             case 'gemini':
                 return 'gemini';
+            case 'microsoft':
+                return 'microsoft';
             default:
                 return normalized;
         }
@@ -3737,7 +3739,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function getOrCreateTextHandlingAudio(cardState, providerSlug) {
         if (!cardState.audioElements.has(providerSlug)) {
-            const audioPath = `audio/${providerSlug}_speech-${cardState.audioNumber}.mp3`;
+            // Microsoft uses .wav files, others use .mp3
+            const audioExtension = providerSlug === 'microsoft' ? 'wav' : 'mp3';
+            const audioPath = `audio/${providerSlug}_speech-${cardState.audioNumber}.${audioExtension}`;
             const audioEl = new Audio(audioPath);
             audioEl.preload = 'auto';
             audioEl.addEventListener('ended', () => handleTextHandlingAudioEnded(cardState, audioEl));
@@ -3922,6 +3926,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return getComputedStyle(document.documentElement).getPropertyValue('--brand-openai') || '#52a584';
             case 'Gemini':
                 return getComputedStyle(document.documentElement).getPropertyValue('--brand-gemini') || '#887eca';
+            case 'Microsoft':
+                return getComputedStyle(document.documentElement).getPropertyValue('--brand-microsoft') || '#00A4EF';
             default:
                 return getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#227CFF';
         }
@@ -3937,6 +3943,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return 'TTS-1';
             case 'gemini':
                 return '2.5 Flash TTS';
+            case 'microsoft':
+                return 'VibeVoice Realtime 0.5B';
             default:
                 return provider || 'Supertonic';
         }
